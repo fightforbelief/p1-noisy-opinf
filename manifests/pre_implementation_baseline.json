@@ -1,0 +1,108 @@
+{
+  "purpose": "Snapshot of the workspace immediately before implementing mc_limit_ar1. It records the current files only and does not prove that those files were unmodified before this snapshot.",
+  "project_root": "/Users/alex/Desktop/projects/Research_Portfolio_2026/p1-noisy-opinf",
+  "created_at_utc": "2026-10-30T02:33:25Z",
+  "python": {
+    "version": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:09:21) [Clang 14.0.6 ]",
+    "executable": "/opt/miniconda3/bin/python3.13",
+    "note": "Tests use this already-installed interpreter. The default python3 on this machine is 3.9.0 and does not have pytest. No packages were installed for this baseline."
+  },
+  "dependencies": {
+    "numpy": "2.5.1",
+    "scipy": "1.18.0",
+    "pandas": "3.0.5",
+    "yaml": "6.0.3",
+    "pytest": "9.1.1",
+    "joblib": "1.5.3",
+    "tqdm": "4.67.1"
+  },
+  "missing_dependencies": [
+    "matplotlib"
+  ],
+  "directory_structure": [
+    "p1-noisy-opinf-docs",
+    "p1-noisy-opinf-docs/reference",
+    "uploads"
+  ],
+  "file_count": 13,
+  "files": [
+    {
+      "path": "p1-noisy-opinf-docs/00_README_先读这个.md",
+      "sha256": "94a9bc0095ce6e1d1ead861a1fe7c5106106f8fe2006afc855a47af6bb40f05b",
+      "bytes": 5421,
+      "file_type": "markdown"
+    },
+    {
+      "path": "p1-noisy-opinf-docs/01_研究问题与假设.md",
+      "sha256": "238d57536dcd64ea7154ac964d3b0e4d9ae9eacbcae9e3bf668f742da57de8db",
+      "bytes": 6337,
+      "file_type": "markdown"
+    },
+    {
+      "path": "p1-noisy-opinf-docs/02_数学与估计器规格.md",
+      "sha256": "715a207bee884358b8d1cc82bf098530e6f7a0f0eb0230ba78cd803b0c22dafa",
+      "bytes": 21673,
+      "file_type": "markdown"
+    },
+    {
+      "path": "p1-noisy-opinf-docs/03_实现规格.md",
+      "sha256": "df97b4bcf087609fc0f502685ffd7bbcdc0cd8492b2c9bbed83b8bd5a088b15f",
+      "bytes": 14409,
+      "file_type": "markdown"
+    },
+    {
+      "path": "p1-noisy-opinf-docs/04_实验设计.md",
+      "sha256": "f62c5e3f866b6284cc436dcf82fcbba19cdcd2908cf8dced63c4562b82e24c42",
+      "bytes": 10932,
+      "file_type": "markdown"
+    },
+    {
+      "path": "p1-noisy-opinf-docs/05_测试与验证.md",
+      "sha256": "af6bfb0b54f0beac5db3619dd97b4fce2ef293828454e23f397ae338d5b2f3f6",
+      "bytes": 5535,
+      "file_type": "markdown"
+    },
+    {
+      "path": "p1-noisy-opinf-docs/06_远程Windows运行手册.md",
+      "sha256": "f18f5f159756a3e016fa4942898f4d8a68da3fe3f063e05afdd75f101be12327",
+      "bytes": 5504,
+      "file_type": "markdown"
+    },
+    {
+      "path": "p1-noisy-opinf-docs/07_工作规则与汇报格式.md",
+      "sha256": "b6bc1955c466f41a9ddae428614179d61486c4cfad01479834f8687d3ea65aa3",
+      "bytes": 4094,
+      "file_type": "markdown"
+    },
+    {
+      "path": "p1-noisy-opinf-docs/08_最终报告模板.md",
+      "sha256": "835ddac314e25efd80640d994f276d79330af8d4ae2a27dc8f3fa8a15a8780b7",
+      "bytes": 2275,
+      "file_type": "markdown"
+    },
+    {
+      "path": "p1-noisy-opinf-docs/AR1_MC极限公式冲突审阅.md",
+      "sha256": "5562c64aeb1303ba2da3cf8d350eb91f065f10e0243b8c779e23da8d1d714e3f",
+      "bytes": 13614,
+      "file_type": "markdown"
+    },
+    {
+      "path": "p1-noisy-opinf-docs/AR1_MC极限公式规格修订记录.md",
+      "sha256": "6f37ad4639349b63dd880a7015ea007d7be11a036059c1d392c2a09ee352a599",
+      "bytes": 6372,
+      "file_type": "markdown"
+    },
+    {
+      "path": "p1-noisy-opinf-docs/reference/pilot_reference.py",
+      "sha256": "5398a1b4a010eec25beb5b9790167f3b258cff35b9442f3fdfb44da2a8f3d637",
+      "bytes": 4686,
+      "file_type": "python"
+    },
+    {
+      "path": "uploads/AR1_MC理论修订只读审计.md",
+      "sha256": "ca4efb22811ea20630a1ea13ae1057077848134f430bc1532e3605c7ff6e0b46",
+      "bytes": 5702,
+      "file_type": "markdown"
+    }
+  ]
+}
