@@ -207,3 +207,21 @@ S1、ETDRK4、S2、S3、数据生成和 POD 都已在远程实现并运行。分
 **下一步：** 等待负责人决定。不启动 E0–E8。
 
 **最终状态：** `STAGE2_CORE_ESTIMATORS_AND_THEORY_INCOMPLETE`
+
+## Stage 2 文件清单 — 2026-10-30 16:56
+
+**远程 git commit：** 清单和本段汇报在本提交中。此前的实现提交没有改动。
+
+**做了什么：**
+
+1. 任务 1 到 3 已在 `140c5ce20233a5d726b942e3698973d4f3721344`、`089a91e579107b0d8456369032bdaf8af39ed92c` 和 `a45e005a83c0dd2d2f1fdd121685567c6141d8c3` 中完成。这次没有再改 σ² 公式、估计器、`mc_limit_ar1`、AR(1) 递推或种子。
+2. 在该 HEAD 上重跑完整 pytest：50 通过，1 失败，19.11 秒。失败项仍是 `tests/test_estimators.py::test_iv_intercept_correction`，数值与 16:31 的记录相同。
+3. 生成 `manifests/pre_implementation_baseline.json`。它记录的是实现已经提交之后的 `a45e005a83c0dd2d2f1fdd121685567c6141d8c3`，不是写代码之前的空树。范围是当时 `git ls-files` 的 49 个文件，不含 `.venv`、`data`、`logs`、`results`。Python 为 `.venv` 中的 Python 3.12.10，并附有 `pip freeze` 的 23 行。
+
+**测试状态：** 50 通过 / 51 项，1 失败。
+
+**实验运行：** 未运行。没有启动 E0–E8。
+
+**阻塞项：** `test_iv_intercept_correction`。一次拟合的截距误差范数是 3.205055642415369e-05，渐近偏差范数是 1.1510620950775699e-07，相对差约 278，没有达到 10%。修正算术与 02 一致。没有放宽阈值，也没有改公式。
+
+**最终状态：** `STAGE2_CORE_ESTIMATORS_AND_THEORY_INCOMPLETE`

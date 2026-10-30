@@ -1,108 +1,329 @@
 {
-  "purpose": "Snapshot of the workspace immediately before implementing mc_limit_ar1. It records the current files only and does not prove that those files were unmodified before this snapshot.",
-  "project_root": "/Users/alex/Desktop/projects/Research_Portfolio_2026/p1-noisy-opinf",
-  "created_at_utc": "2026-10-30T02:33:25Z",
-  "python": {
-    "version": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:09:21) [Clang 14.0.6 ]",
-    "executable": "/opt/miniconda3/bin/python3.13",
-    "note": "Tests use this already-installed interpreter. The default python3 on this machine is 3.9.0 and does not have pytest. No packages were installed for this baseline."
-  },
-  "dependencies": {
-    "numpy": "2.5.1",
-    "scipy": "1.18.0",
-    "pandas": "3.0.5",
-    "yaml": "6.0.3",
-    "pytest": "9.1.1",
-    "joblib": "1.5.3",
-    "tqdm": "4.67.1"
-  },
-  "missing_dependencies": [
-    "matplotlib"
+  "project_path": "C:\\Users\\hanqi\\Desktop\\projects\\p1-noisy-opinf",
+  "time": "2026-10-30T16:56:47",
+  "git_head": "a45e005a83c0dd2d2f1fdd121685567c6141d8c3",
+  "python_version": "Python 3.12.10",
+  "pip_freeze": [
+    "cloudpickle==3.1.2",
+    "colorama==0.4.6",
+    "contourpy==1.4.0",
+    "cycler==0.12.1",
+    "fonttools==4.68.0",
+    "iniconfig==2.3.1",
+    "joblib==1.6.0",
+    "kiwisolver==1.5.1",
+    "matplotlib==3.11.2",
+    "numpy==2.5.4",
+    "packaging==26.3",
+    "pandas==3.1.0",
+    "pillow==13.0.0",
+    "pluggy==1.7.0",
+    "Pygments==2.21.0",
+    "pyparsing==3.3.3",
+    "pytest==9.2.0",
+    "python-dateutil==3.0.0",
+    "PyYAML==6.0.3",
+    "scipy==1.18.1",
+    "six==1.17.0",
+    "tqdm==4.70.1",
+    "tzdata==2026.6"
   ],
-  "directory_structure": [
-    "p1-noisy-opinf-docs",
-    "p1-noisy-opinf-docs/reference",
-    "uploads"
-  ],
-  "file_count": 13,
+  "scope": "git ls-files at git_head; excludes .git, .venv, data, logs, results",
+  "file_count": 49,
   "files": [
     {
-      "path": "p1-noisy-opinf-docs/00_README_先读这个.md",
+      "path": ".gitattributes",
+      "sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+      "size": 19,
+      "type": "file"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "6eaa433448613f645ce948be680cc98b8dba3cb56a697f36f2615e9b10256c7b",
+      "size": 71,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "sha256": "b1896b63c14f5fb34c7d5092ddb895e071bbf771c13c8d0775e683fd9f1cbbbc",
+      "size": 270,
+      "type": "md"
+    },
+    {
+      "path": "configs/systems.yaml",
+      "sha256": "305c0b870a61d129204849570f1eb366822d124b4caa661b69598d3ee5151e42",
+      "size": 226,
+      "type": "yaml"
+    },
+    {
+      "path": "manifests/pre_implementation_baseline.json",
+      "sha256": "d802665b07ad8293a4388a56237de94306daf2b931ef5dd6d5763139e48a816e",
+      "size": 3828,
+      "type": "json"
+    },
+    {
+      "path": "p1-noisy-opinf-docs/00_README_\u5148\u8bfb\u8fd9\u4e2a.md",
       "sha256": "94a9bc0095ce6e1d1ead861a1fe7c5106106f8fe2006afc855a47af6bb40f05b",
-      "bytes": 5421,
-      "file_type": "markdown"
+      "size": 5421,
+      "type": "md"
     },
     {
-      "path": "p1-noisy-opinf-docs/01_研究问题与假设.md",
+      "path": "p1-noisy-opinf-docs/01_\u7814\u7a76\u95ee\u9898\u4e0e\u5047\u8bbe.md",
       "sha256": "238d57536dcd64ea7154ac964d3b0e4d9ae9eacbcae9e3bf668f742da57de8db",
-      "bytes": 6337,
-      "file_type": "markdown"
+      "size": 6337,
+      "type": "md"
     },
     {
-      "path": "p1-noisy-opinf-docs/02_数学与估计器规格.md",
-      "sha256": "715a207bee884358b8d1cc82bf098530e6f7a0f0eb0230ba78cd803b0c22dafa",
-      "bytes": 21673,
-      "file_type": "markdown"
+      "path": "p1-noisy-opinf-docs/02_\u6570\u5b66\u4e0e\u4f30\u8ba1\u5668\u89c4\u683c.md",
+      "sha256": "6b3edefca1ef1c782f75eca8960fc6feb3bc04a7fb34e81f75d51f3bced64eb1",
+      "size": 22196,
+      "type": "md"
     },
     {
-      "path": "p1-noisy-opinf-docs/03_实现规格.md",
+      "path": "p1-noisy-opinf-docs/03_\u5b9e\u73b0\u89c4\u683c.md",
       "sha256": "df97b4bcf087609fc0f502685ffd7bbcdc0cd8492b2c9bbed83b8bd5a088b15f",
-      "bytes": 14409,
-      "file_type": "markdown"
+      "size": 14409,
+      "type": "md"
     },
     {
-      "path": "p1-noisy-opinf-docs/04_实验设计.md",
+      "path": "p1-noisy-opinf-docs/04_\u5b9e\u9a8c\u8bbe\u8ba1.md",
       "sha256": "f62c5e3f866b6284cc436dcf82fcbba19cdcd2908cf8dced63c4562b82e24c42",
-      "bytes": 10932,
-      "file_type": "markdown"
+      "size": 10932,
+      "type": "md"
     },
     {
-      "path": "p1-noisy-opinf-docs/05_测试与验证.md",
+      "path": "p1-noisy-opinf-docs/05_\u6d4b\u8bd5\u4e0e\u9a8c\u8bc1.md",
       "sha256": "af6bfb0b54f0beac5db3619dd97b4fce2ef293828454e23f397ae338d5b2f3f6",
-      "bytes": 5535,
-      "file_type": "markdown"
+      "size": 5535,
+      "type": "md"
     },
     {
-      "path": "p1-noisy-opinf-docs/06_远程Windows运行手册.md",
+      "path": "p1-noisy-opinf-docs/06_\u8fdc\u7a0bWindows\u8fd0\u884c\u624b\u518c.md",
       "sha256": "f18f5f159756a3e016fa4942898f4d8a68da3fe3f063e05afdd75f101be12327",
-      "bytes": 5504,
-      "file_type": "markdown"
+      "size": 5504,
+      "type": "md"
     },
     {
-      "path": "p1-noisy-opinf-docs/07_工作规则与汇报格式.md",
+      "path": "p1-noisy-opinf-docs/07_\u5de5\u4f5c\u89c4\u5219\u4e0e\u6c47\u62a5\u683c\u5f0f.md",
       "sha256": "b6bc1955c466f41a9ddae428614179d61486c4cfad01479834f8687d3ea65aa3",
-      "bytes": 4094,
-      "file_type": "markdown"
+      "size": 4094,
+      "type": "md"
     },
     {
-      "path": "p1-noisy-opinf-docs/08_最终报告模板.md",
+      "path": "p1-noisy-opinf-docs/08_\u6700\u7ec8\u62a5\u544a\u6a21\u677f.md",
       "sha256": "835ddac314e25efd80640d994f276d79330af8d4ae2a27dc8f3fa8a15a8780b7",
-      "bytes": 2275,
-      "file_type": "markdown"
+      "size": 2275,
+      "type": "md"
     },
     {
-      "path": "p1-noisy-opinf-docs/AR1_MC极限公式冲突审阅.md",
+      "path": "p1-noisy-opinf-docs/AR1_MC\u6781\u9650\u516c\u5f0f\u51b2\u7a81\u5ba1\u9605.md",
       "sha256": "5562c64aeb1303ba2da3cf8d350eb91f065f10e0243b8c779e23da8d1d714e3f",
-      "bytes": 13614,
-      "file_type": "markdown"
+      "size": 13614,
+      "type": "md"
     },
     {
-      "path": "p1-noisy-opinf-docs/AR1_MC极限公式规格修订记录.md",
+      "path": "p1-noisy-opinf-docs/AR1_MC\u6781\u9650\u516c\u5f0f\u89c4\u683c\u4fee\u8ba2\u8bb0\u5f55.md",
       "sha256": "6f37ad4639349b63dd880a7015ea007d7be11a036059c1d392c2a09ee352a599",
-      "bytes": 6372,
-      "file_type": "markdown"
+      "size": 6372,
+      "type": "md"
     },
     {
       "path": "p1-noisy-opinf-docs/reference/pilot_reference.py",
       "sha256": "5398a1b4a010eec25beb5b9790167f3b258cff35b9442f3fdfb44da2a8f3d637",
-      "bytes": 4686,
-      "file_type": "python"
+      "size": 4686,
+      "type": "py"
     },
     {
-      "path": "uploads/AR1_MC理论修订只读审计.md",
-      "sha256": "ca4efb22811ea20630a1ea13ae1057077848134f430bc1532e3605c7ff6e0b46",
-      "bytes": 5702,
-      "file_type": "markdown"
+      "path": "pytest.ini",
+      "sha256": "363381771127e3479fe49773659cc2a8dc2b2f727459ebd057ac39e79e98a94e",
+      "size": 26,
+      "type": "ini"
+    },
+    {
+      "path": "reports/ENV_CHECK.md",
+      "sha256": "3449365b7ea7d7e0c0c9303d3dae77e57964b280ec7b5c6e5ef9c19b7a19aa67",
+      "size": 452,
+      "type": "md"
+    },
+    {
+      "path": "reports/PROGRESS.md",
+      "sha256": "97251dff942a92f8b4dc4ea25888c2486795ad0caecc639fa5ef5ac33c6dc0a7",
+      "size": 12308,
+      "type": "md"
+    },
+    {
+      "path": "reports/pip_freeze.txt",
+      "sha256": "593f485a2ffb0baeac612a62bead6f3c4356be85493042b6fea9f1a6bf063e51",
+      "size": 387,
+      "type": "txt"
+    },
+    {
+      "path": "reports/stage1_acceptance.json",
+      "sha256": "3d4c438819385c258206032510f22cb72b66ae63e4d500b57b237f84d2aad614",
+      "size": 1010,
+      "type": "json"
+    },
+    {
+      "path": "requirements.txt",
+      "sha256": "276231834a747b5a8f9c1af92b61ddead42ae30d4297c536708c7aa82871381a",
+      "size": 115,
+      "type": "txt"
+    },
+    {
+      "path": "scripts/env_check.py",
+      "sha256": "12d83a6f9b8419484a3266856177c23ecc53ab87e9fdd05bc102e8a7e5bc47c0",
+      "size": 2103,
+      "type": "py"
+    },
+    {
+      "path": "scripts/stage1_acceptance.py",
+      "sha256": "0c2ecebd0ebcfa12f77061a7124bc06d88191abeb50265896b15ab6d8185c0b8",
+      "size": 2946,
+      "type": "py"
+    },
+    {
+      "path": "src/noisyopinf/__init__.py",
+      "sha256": "d57444ae392681c3c9ace4c5b964739d6eeabbf5b251641694e09df9a33450ee",
+      "size": 134,
+      "type": "py"
+    },
+    {
+      "path": "src/noisyopinf/data.py",
+      "sha256": "51edfd9453bff6a60d5100c16ff45d5f5fe8176049c2d07a479ff4fbce150678",
+      "size": 4727,
+      "type": "py"
+    },
+    {
+      "path": "src/noisyopinf/estimators.py",
+      "sha256": "26c5458fb6f054e3abec754f39e469853e6c755a289d1e7bf1b8a5b70fd3c71c",
+      "size": 11012,
+      "type": "py"
+    },
+    {
+      "path": "src/noisyopinf/features.py",
+      "sha256": "24dd2453330d880f416f7783de2b6b4b02cdc5b7c51f37b116c5388fd7da7153",
+      "size": 2432,
+      "type": "py"
+    },
+    {
+      "path": "src/noisyopinf/noise.py",
+      "sha256": "5ff9778c7bca3da1e51c85bbde53093ac13b887f87195fe53eb96dc245e0deac",
+      "size": 1837,
+      "type": "py"
+    },
+    {
+      "path": "src/noisyopinf/pod.py",
+      "sha256": "83c8ea68ce98ce17caac7eac9d55516f92b3914b0ac0bcb1b5fe3466bd791a6d",
+      "size": 3969,
+      "type": "py"
+    },
+    {
+      "path": "src/noisyopinf/seeds.py",
+      "sha256": "ac3a246b35fc718f5eaaa01afcecdf0434f01f3b0637175ddf99a19e4d9b8473",
+      "size": 311,
+      "type": "py"
+    },
+    {
+      "path": "src/noisyopinf/systems/__init__.py",
+      "sha256": "5e568621e0f4a416a93d7a105ea87606cee6c448eb188445f8898a101ef06668",
+      "size": 28,
+      "type": "py"
+    },
+    {
+      "path": "src/noisyopinf/systems/burgers.py",
+      "sha256": "23ce01bc7c49d2bfcf9de62db8e6df2d6a125085fc2e2b979ab1ea5b9ced4044",
+      "size": 1492,
+      "type": "py"
+    },
+    {
+      "path": "src/noisyopinf/systems/config.py",
+      "sha256": "7b2a7fef655b890aebb8fc5612de9dfbb65a5608cbba20557370d80fe8d50cbd",
+      "size": 571,
+      "type": "py"
+    },
+    {
+      "path": "src/noisyopinf/systems/galerkin_burgers.py",
+      "sha256": "b2c82458414732aba09e86351da72adc1630886c86b9c81a6024586eb4e1065a",
+      "size": 4339,
+      "type": "py"
+    },
+    {
+      "path": "src/noisyopinf/systems/kdv_burgers.py",
+      "sha256": "8d877a391be9ea98579e1ce6332bd7f6f911529c2cdf10c6cb1ce97603492070",
+      "size": 1142,
+      "type": "py"
+    },
+    {
+      "path": "src/noisyopinf/systems/spectral.py",
+      "sha256": "84b97d0e85b092681aa1a2ed3e667caf459810876f0ec85d32ea549fd3d6dcf5",
+      "size": 3718,
+      "type": "py"
+    },
+    {
+      "path": "src/noisyopinf/theory.py",
+      "sha256": "264c777fb42388a298ceda6a2fd600fc55ac43076beb4f1d46af0ede16975a13",
+      "size": 8110,
+      "type": "py"
+    },
+    {
+      "path": "tests/__init__.py",
+      "sha256": "de32e339ab691c17e616518c365cae9098d7070945558204483aa73dcfa8a141",
+      "size": 19,
+      "type": "py"
+    },
+    {
+      "path": "tests/quadratic_system.py",
+      "sha256": "85ea1edb01dabc51bed4dfc7b1623cef92244f5f77c7b3f434a8b9b321dc96cf",
+      "size": 1529,
+      "type": "py"
+    },
+    {
+      "path": "tests/test_data_pod.py",
+      "sha256": "c439a1f6c01ea342f402088a4e203881de24fc44c32a68e921e0d83b3dbc3152",
+      "size": 3859,
+      "type": "py"
+    },
+    {
+      "path": "tests/test_estimators.py",
+      "sha256": "f730ec804f361d171c87f714a5d3b9a3b3847598518527f2de7016dc525361e9",
+      "size": 4597,
+      "type": "py"
+    },
+    {
+      "path": "tests/test_features.py",
+      "sha256": "ee93a33573b491da30febc36ba73d5fafc483e92ee891585cf3f1de979b3833e",
+      "size": 1072,
+      "type": "py"
+    },
+    {
+      "path": "tests/test_hermite.py",
+      "sha256": "c5c8f07e6f56298742132c6165af5c7581c4fa049ffbee5df62651846b1b1024",
+      "size": 3374,
+      "type": "py"
+    },
+    {
+      "path": "tests/test_noise_pod.py",
+      "sha256": "6b055799d39c33a8bec5528cd8fd508a28ae5026034234b0e73d96964702a05b",
+      "size": 1414,
+      "type": "py"
+    },
+    {
+      "path": "tests/test_reference_values.py",
+      "sha256": "73645b48555ccb351c699483f224c21412f911f12a85dc0d7a05c2e252981128",
+      "size": 2160,
+      "type": "py"
+    },
+    {
+      "path": "tests/test_systems.py",
+      "sha256": "18ae443ff392253efff96aa28da4d2e248ae65013390d536e32533aa790526e4",
+      "size": 2593,
+      "type": "py"
+    },
+    {
+      "path": "tests/test_theory.py",
+      "sha256": "5e7e5ceae8b3b0c2a8094890d7417dd55d29df7dc40648f60a9f57fe384cc3b8",
+      "size": 10848,
+      "type": "py"
     }
   ]
 }
