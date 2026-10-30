@@ -230,3 +230,56 @@ def _quadratic_step(
 def _rms(trajs: list[np.ndarray]) -> float:
     stacked = np.vstack(trajs)
     return float(np.sqrt(np.mean(np.sum(stacked * stacked, axis=1) / stacked.shape[1])))
+
+
+def test_ols_limit_zero_noise():
+    from noisyopinf.theory import ols_limit
+    from tests.quadratic_system import quadratic_operator, relative_error, rollout
+
+    operator = quadratic_operator((11, 80))
+    trajs = rollout(operator, 8, 40, (11, 81))
+    assert relative_error(ols_limit(trajs, 0.0), fit(trajs, "ols").O) < 1e-10
+
+
+def test_linear_attenuation():
+    from noisyopinf.theory import linear_attenuation_limit, ols_limit
+
+    matrix = rng(11, 82).normal(size=(3, 3))
+    matrix *= 0.8 / np.max(np.abs(np.linalg.eigvals(matrix)))
+    trajs = []
+    gen = rng(11, 83)
+    for _ in range(5):
+        state = gen.normal(size=3)
+        traj = np.empty((21, 3))
+        traj[0] = state
+        for time in range(20):
+            state = matrix @ state
+            traj[time + 1] = state
+        trajs.append(traj)
+    inputs = np.vstack([traj[:-1] for traj in trajs])
+    moment = inputs.T @ inputs / inputs.shape[0]
+    variance = 0.04
+    solved = ols_limit(trajs, variance, dictionary="linear")
+    expected = linear_attenuation_limit(matrix, moment, variance)
+    gap = np.linalg.norm(solved.T - expected) / np.linalg.norm(expected)
+    assert gap < 1e-10
+
+
+def test_ols_limit_matches_mc():
+    from noisyopinf.noise import add_white
+    from noisyopinf.theory import ols_limit
+    from tests.quadratic_system import quadratic_operator, rollout
+
+    operator = quadratic_operator((11, 84))
+    trajs = rollout(operator, 200, 100, (11, 85))
+    sigma = 0.05 * _rms(trajs)
+    limit = ols_limit(trajs, sigma**2)
+    accumulated = np.zeros_like(limit)
+    for rep in range(200):
+        gen = rng(11, 86, rep)
+        noisy = [add_white(traj, sigma, gen) for traj in trajs]
+        accumulated += fit(noisy, "ols").O
+    mean = accumulated / 200.0
+    bias = np.linalg.norm(limit - operator)
+    assert bias > 0.0
+    assert np.linalg.norm(mean - limit) < 0.1 * bias

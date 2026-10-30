@@ -6,7 +6,7 @@ from collections.abc import Sequence
 
 import numpy as np
 
-from noisyopinf.features import features, quad_index
+from noisyopinf.features import diag_quad_rows, exponents, features, quad_index
 
 
 def mc_limit_ar1(
@@ -103,3 +103,111 @@ def _to_original(operator: np.ndarray, rank: int, kappa: float) -> np.ndarray:
     restored[rank:rank + quad_count] /= kappa
     restored[-1] *= kappa
     return restored
+
+
+def expected_monomial(q: np.ndarray, alpha: np.ndarray, s2: float) -> float:
+    """一个干净状态上 E[q̃^α]。次数最高到 4。"""
+    state = np.asarray(q, dtype=np.float64)
+    powers = np.asarray(alpha, dtype=int)
+    acc = 1.0
+    for coord, degree in enumerate(powers):
+        acc *= float(_raw_power(state[coord], int(degree), float(s2)))
+    return acc
+
+
+def expected_monomial_sums(clean_trajs: Sequence[np.ndarray], s2: float, alphas: np.ndarray) -> np.ndarray:
+    """配对输入上 E[q̃^α] 的和。不含末端快照，不跨轨迹。"""
+    trajs, _ = _validated_trajs(clean_trajs)
+    variance = _check_noise(s2, 0.0)[0]
+    inputs, _ = _pair_states(trajs)
+    return _monomial_sums(inputs, variance, np.asarray(alphas, dtype=int))
+
+
+def ols_limit(clean_trajs: Sequence[np.ndarray], s2: float, *, dictionary: str = "full") -> np.ndarray:
+    """O_lim = Ḡ(σ²)^{-1} C̄(σ²)。线性字典返回 (r, r) 的回归系数。"""
+    trajs, rank = _validated_trajs(clean_trajs)
+    variance = _check_noise(s2, 0.0)[0]
+    kappa = _peak_abs(trajs)
+    scaled = [traj / kappa for traj in trajs]
+    solved = _ols_limit_scaled(scaled, variance / kappa**2, dictionary)
+    if dictionary == "linear" or not np.isfinite(solved).all():
+        return solved
+    return _to_original(solved, rank, kappa)
+
+
+def linear_attenuation_limit(A: np.ndarray, M: np.ndarray, s2: float) -> np.ndarray:
+    """纯线性回归稀释：A M (M+σ² I)^{-1}。"""
+    matrix = np.asarray(M, dtype=np.float64)
+    eye = np.eye(matrix.shape[0], dtype=np.float64)
+    return np.asarray(A, dtype=np.float64) @ matrix @ np.linalg.inv(matrix + float(s2) * eye)
+
+
+def _ols_limit_scaled(trajs: Sequence[np.ndarray], variance: float, dictionary: str) -> np.ndarray:
+    inputs, outputs = _pair_states(trajs)
+    if dictionary == "linear":
+        return _linear_limit(inputs, outputs, variance)
+    if dictionary != "full":
+        raise ValueError("dictionary must be 'full' or 'linear'")
+    return _full_limit(inputs, outputs, variance)
+
+
+def _linear_limit(inputs: np.ndarray, outputs: np.ndarray, variance: float) -> np.ndarray:
+    gram = inputs.T @ inputs + inputs.shape[0] * variance * np.eye(inputs.shape[1])
+    try:
+        return np.linalg.solve(gram, inputs.T @ outputs)
+    except np.linalg.LinAlgError:
+        return np.full((inputs.shape[1], outputs.shape[1]), np.nan)
+
+
+def _full_limit(inputs: np.ndarray, outputs: np.ndarray, variance: float) -> np.ndarray:
+    table = exponents(inputs.shape[1])
+    width = table.shape[0]
+    alphas = (table[:, None, :] + table[None, :, :]).reshape(-1, table.shape[1])
+    gram = _monomial_sums(inputs, variance, alphas).reshape(width, width)
+    shift = np.zeros(width, dtype=np.float64)
+    shift[diag_quad_rows(inputs.shape[1])] = variance
+    cross = (features(inputs) + shift).T @ outputs
+    try:
+        return np.linalg.solve(gram, cross)
+    except np.linalg.LinAlgError:
+        return np.full((width, outputs.shape[1]), np.nan)
+
+
+def _raw_power(value: float, degree: int, variance: float) -> float:
+    if degree == 0:
+        return 1.0
+    if degree == 1:
+        return float(value)
+    square = float(value) * float(value)
+    if degree == 2:
+        return square + variance
+    if degree == 3:
+        return square * float(value) + 3.0 * variance * float(value)
+    if degree == 4:
+        return square * square + 6.0 * variance * square + 3.0 * variance * variance
+    raise ValueError("moment degree must be at most 4")
+
+
+def _monomial_sums(states: np.ndarray, variance: float, alphas: np.ndarray) -> np.ndarray:
+    acc = np.ones((alphas.shape[0], states.shape[0]), dtype=np.float64)
+    for coord in range(states.shape[1]):
+        column = np.empty((alphas.shape[0], states.shape[0]), dtype=np.float64)
+        for degree in range(5):
+            mask = alphas[:, coord] == degree
+            if np.any(mask):
+                column[mask] = _power_row(states[:, coord], degree, variance)
+        acc *= column
+    return acc.sum(axis=1)
+
+
+def _power_row(values: np.ndarray, degree: int, variance: float) -> np.ndarray:
+    if degree == 0:
+        return np.ones_like(values)
+    if degree == 1:
+        return values
+    square = values * values
+    if degree == 2:
+        return square + variance
+    if degree == 3:
+        return values * square + 3.0 * variance * values
+    return square * square + 6.0 * variance * square + 3.0 * variance * variance
