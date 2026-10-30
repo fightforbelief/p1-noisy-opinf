@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 
 from noisyopinf.data import get_splits
-from noisyopinf.pod import estimate_sigma2, mp_median, pod_basis, project, snapshot_matrix
+from noisyopinf.pod import estimate_sigma2, mp_median, mp_quantile, pod_basis, project, snapshot_matrix
 from noisyopinf.seeds import rng
 
 
@@ -59,8 +59,18 @@ def test_trailing_median_matches_formula():
     snaps = rng(8, 5).normal(size=(16, 8))
     estimate, diagnostics = estimate_sigma2([snaps], method="trailing_median")
     eigs = np.linalg.svd(snapshot_matrix([snaps]), compute_uv=False) ** 2 / 16.0
-    assert abs(estimate - float(np.median(eigs[4:]))) < 1e-12
+    calibrated = float(np.median(eigs[4:])) / mp_quantile(8.0 / 16.0, 0.25)
+    assert abs(estimate - calibrated) < 1e-12
     assert diagnostics["K_tot"] == 16
+
+
+def test_mp_lower_quartile():
+    beta = 0.25
+    quartile = mp_quantile(beta, 0.25)
+    median = mp_quantile(beta, 0.5)
+    root = np.sqrt(beta)
+    assert abs(median - mp_median(beta)) < 1e-10
+    assert (1.0 - root) ** 2 < quartile < median < (1.0 + root) ** 2
 
 
 def test_mp_median_lies_in_bulk():
@@ -68,6 +78,15 @@ def test_mp_median_lies_in_bulk():
     median = mp_median(beta)
     root = np.sqrt(beta)
     assert (1.0 - root) ** 2 < median < (1.0 + root) ** 2
+
+
+def test_gavish_donoho_still_uses_median():
+    snaps = rng(8, 5).normal(size=(16, 8))
+    estimate, _ = estimate_sigma2([snaps], method="gavish_donoho")
+    matrix = snapshot_matrix([snaps])
+    sigma = np.median(np.linalg.svd(matrix, compute_uv=False))
+    expected = float((sigma / np.sqrt(16.0 * mp_median(0.5))) ** 2)
+    assert abs(estimate - expected) < 1e-12
 
 
 def test_sigma2_trailing():

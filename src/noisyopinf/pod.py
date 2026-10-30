@@ -37,27 +37,37 @@ def project(U: np.ndarray, V: np.ndarray) -> np.ndarray:
     return np.asarray(U, dtype=np.float64) @ np.asarray(V, dtype=np.float64)
 
 
-def mp_median(beta: float) -> float:
-    """Marchenko–Pastur 密度的中位数。β = N/K_tot，且 β < 1。"""
+def _mp_edges(beta: float) -> tuple[float, float]:
+    """Marchenko–Pastur 支撑端点。β 必须在 (0, 1)。"""
     if not 0.0 < beta < 1.0:
         raise ValueError("beta must lie in (0, 1)")
     root = float(np.sqrt(beta))
-    low = (1.0 - root) ** 2
-    high = (1.0 + root) ** 2
+    return (1.0 - root) ** 2, (1.0 + root) ** 2
+
+
+def mp_quantile(beta: float, probability: float) -> float:
+    """Marchenko–Pastur 密度的指定分位数。"""
+    if not 0.0 < probability < 1.0:
+        raise ValueError("probability must lie in (0, 1)")
+    low, high = _mp_edges(float(beta))
 
     def density(lam: float) -> float:
         span = (high - lam) * (lam - low)
         if span <= 0.0:
             return 0.0
-        return float(np.sqrt(span) / (2.0 * np.pi * beta * lam))
+        return float(np.sqrt(span) / (2.0 * np.pi * float(beta) * lam))
 
     def centered(point: float) -> float:
         value, _ = integrate.quad(density, low, point, epsabs=1e-12, limit=200)
-        return value - 0.5
+        return value - float(probability)
 
-    left = low + (high - low) * 1e-10
-    right = high - (high - low) * 1e-10
-    return float(optimize.brentq(centered, left, right))
+    span = high - low
+    return float(optimize.brentq(centered, low + span * 1e-10, high - span * 1e-10))
+
+
+def mp_median(beta: float) -> float:
+    """Marchenko–Pastur 密度的中位数，等于 mp_quantile(beta, 0.5)。"""
+    return mp_quantile(beta, 0.5)
 
 
 def _covariance_eigs(matrix: np.ndarray) -> np.ndarray:
@@ -68,10 +78,11 @@ def _covariance_eigs(matrix: np.ndarray) -> np.ndarray:
 
 def _sigma2_from(matrix: np.ndarray, method: str) -> float:
     n, k_tot = matrix.shape
+    beta = n / float(k_tot)
     if method == "trailing_median":
-        return float(np.median(_covariance_eigs(matrix)[n // 2 :]))
+        raw = float(np.median(_covariance_eigs(matrix)[n // 2 :]))
+        return raw / mp_quantile(beta, 0.25)
     if method == "gavish_donoho":
-        beta = n / float(k_tot)
         sigma = np.median(np.linalg.svd(matrix, compute_uv=False))
         return float((sigma / np.sqrt(k_tot * mp_median(beta))) ** 2)
     raise ValueError(method)
