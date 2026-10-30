@@ -120,3 +120,90 @@ S1、ETDRK4、S2、S3、数据生成和 POD 都已在远程实现并运行。分
 - 05 里尚未覆盖的特征、Hermite、估计器和冒烟测试
 - 正式 E0，然后才是 E1–E8
 - E8 在 φ=0 时 `theory_gap_rel` 分母接近 0 的口径仍未决定
+
+## Stage 2 核心估计器与理论 — 2026-10-30 16:31
+
+**远程 git commit：**
+
+- `140c5ce20233a5d726b942e3698973d4f3721344`：修正 `trailing_median` 的 MP 25% 分位数校准。
+- `089a91e579107b0d8456369032bdaf8af39ed92c`：Stage 2 估计器、噪声模块、理论函数和测试。
+
+本汇报在上述两个提交之后单独提交。
+
+**做了什么：**
+
+1. `trailing_median` 改为下半谱中位数除以 Marchenko–Pastur 分布的 25% 分位数。下半谱的取法没有改。Gavish–Donoho 仍使用 MP 中位数。
+2. 实现 `ols`、`ridge`、`mc_psd`、`iv`、`iv2`、`oracle`。`mc` 的 Hermite 矩和交叉矩没有改。`ridge` 的 λ 由调用方传入。
+3. 实现 `add_white` 和 `sigma_from_rho`。`add_ar1` 的递推没有改。
+4. 实现 `expected_monomial`、`expected_monomial_sums`、`ols_limit`、`linear_attenuation_limit`。`mc_limit_ar1` 的已批准公式没有改，函数体也没有改。
+5. 按 05 增加了特征、Hermite、估计器、噪声、参考值和 OLS 极限测试。没有放宽 5% 的 σ² 阈值，也没有更换 `test_sigma2_trailing` 的种子或数据。
+
+**σ² 校准：**
+
+同一组测试数据（N=128，K_tot=2000，秩 5，σ=0.3，种子不变）。β=N/K_tot=0.064。远程诊断脚本用修改前的 `pod.py` 和修改后的 `pod.py` 对同一矩阵计算：
+
+| 量 | 数值 |
+|---|---|
+| 真实 σ² | 0.09 |
+| 旧 `trailing_median` | 0.07165561351841215 |
+| 旧相对误差 | 0.20382651646208722 |
+| μ_{β,0.25} | 0.7894173790126653 |
+| μ_{β,0.5} | 0.9786254990139102 |
+| 新 `trailing_median` | 0.09077025085010514 |
+| 新相对误差 | 0.008558342778945991 |
+| 旧 Gavish–Donoho | 0.09179297619324095 |
+| 新 Gavish–Donoho | 0.09179297619324095 |
+| 两者之差 | 0.0 |
+| `mp_median` 与旧实现之差 | 0.0 |
+
+新相对误差小于 05 要求的 5%。`test_sigma2_trailing` 已通过。
+
+**测试状态：**
+
+针对性测试：43 通过，1 失败，17.05 秒。完整 pytest：50 通过，1 失败，19.20 秒。失败项只有 `tests/test_estimators.py::test_iv_intercept_correction`。
+
+该测试在 n=49750 的一次 IV 拟合上，未修正截距与 `-O^T μ` 的差的范数是 3.205055642415369e-05，而 `||-O^T μ||` 是 1.1510620950775699e-07，比值约 278，没有达到 10%。修正量精确等于 σ² 乘以估计出的对角二次行之和，所以修正算术与 02 的公式一致。一次样本的截距误差比这个 O(σ²) 偏差大约两个数量级。在保持轨迹有界的前提下加大 H 或改变 σ，这个比值仍然远大于 0.1。因此这是 02 的渐近偏差与 05 的 10% 有限样本断言对不上，不是实现把公式写错。没有放宽 10%，也没有改 IV 的定义。按 07 第 3 节停止。
+
+其余已通过的必要测试包括：特征指数与二次项顺序、Hermite 多项式及其无偏性、白噪声与 AR(1) 的方差和自相关、OLS、MC、MC-PSD、IV/IV2 的无噪声恢复与大样本误差下降、oracle、奇异设计返回 NaN、`ols_limit`、`linear_attenuation_limit`、原有的 `mc_limit_ar1`，以及 02 第 3.6 节参考值。
+
+**实验运行：** 未运行。没有启动 E0–E8，没有重跑 Stage 1 的大规模系统生成。
+
+**与规格的偏离：**
+
+- 配对测试除了检查长度为 4 和 5 的两条轨迹给出 7 个配对、而不是跨轨迹的 8 个之外，另用两条长度为 12 的轨迹核对系数。宽度为 10 的设计在 7 行时秩亏，`ols` 按规格返回 NaN，无法再比较系数。阈值没有放宽。
+- Hermite 的 0 次多项式恒为 1，样本标准差为 0。差为 0 时判定为通过。非退化样本仍要求差严格小于 5 倍标准误。
+
+**文件保护：**
+
+`features.py` 与 `seeds.py` 的 SHA-256 未变。`mc_limit_ar1` 只增加了文件后部和 import，函数体未改。
+
+| 文件 | 原 SHA-256 | 现 SHA-256 |
+|---|---|---|
+| `features.py` | `24dd2453330d880f416f7783de2b6b4b02cdc5b7c51f37b116c5388fd7da7153` | 相同 |
+| `seeds.py` | `ac3a246b35fc718f5eaaa01afcecdf0434f01f3b0637175ddf99a19e4d9b8473` | 相同 |
+| `theory.py` | `e762cd190ddd9c92cdf01262a032037189783323f2b199ee39783d3a429cb499` | `264c777fb42388a298ceda6a2fd600fc55ac43076beb4f1d46af0ede16975a13` |
+| `estimators.py` | `ba2e5f473275c70037f2344cca7fbe95317da972074962159650b48896f57704` | `26c5458fb6f054e3abec754f39e469853e6c755a289d1e7bf1b8a5b70fd3c71c` |
+| `noise.py` | `ea39b097255081046cb0a953578f780f8a5d06be70f78bda919eefe39671c6de` | `5ff9778c7bca3da1e51c85bbde53093ac13b887f87195fe53eb96dc245e0deac` |
+| `tests/test_theory.py` | `189b6ff5ad7531a6a35e86fde5567ba22da90385979efad8cc4c6f883c654379` | `5e7e5ceae8b3b0c2a8094890d7417dd55d29df7dc40648f60a9f57fe384cc3b8` |
+| `pod.py` | Stage 1 版本 | `83c8ea68ce98ce17caac7eac9d55516f92b3914b0ac0bcb1b5fe3466bd791a6d` |
+
+**修改文件：**
+
+- 校准提交：`src/noisyopinf/pod.py`，`tests/test_data_pod.py`，`p1-noisy-opinf-docs/02_数学与估计器规格.md`
+- Stage 2 提交：`src/noisyopinf/estimators.py`，`src/noisyopinf/noise.py`，`src/noisyopinf/theory.py`，`tests/test_theory.py`，`tests/__init__.py`，`tests/quadratic_system.py`，`tests/test_features.py`，`tests/test_hermite.py`，`tests/test_estimators.py`，`tests/test_noise_pod.py`，`tests/test_reference_values.py`
+
+**未完成：**
+
+- `test_iv_intercept_correction` 未通过，见上。
+- rollout、metrics、io_utils 和实验报告流水线没有实现。
+- E0–E8 没有启动。
+- E8 在 φ=0 时 `theory_gap_rel` 的填报口径没有改。
+- S1/S2/S3 参数没有改。AR(1) 的 Δ 没有改。
+
+**问题与建议：**
+
+`test_iv_intercept_correction` 要求 n=50000 时未修正的 ĉ 与 `-O^T μ` 的相对差小于 10%。在 05 规定的有界随机二次系统上，这个偏差是 O(σ²)，一次拟合的截距标准误比它大两个数量级。需要负责人决定：是保持 10% 并改用可分辨该偏差的检验方式，还是确认当前 IV 修正实现后把该断言移出本阶段的阻塞项。在此之前不继续实验。
+
+**下一步：** 等待负责人决定。不启动 E0–E8。
+
+**最终状态：** `STAGE2_CORE_ESTIMATORS_AND_THEORY_INCOMPLETE`
