@@ -1,0 +1,21 @@
+s1:
+  M: 4
+  nu: 0.02
+  h: 0.005
+  Ng: 64
+  K: 300
+s2:
+  N: 256
+  nu: 0.01
+  dt: 2.5e-4
+  dt_obs: 0.005
+  K: 200
+  amplitude: 0.5
+s3:
+  N: 512
+  nu: 0.005
+  delta: 1.0e-5
+  dt: 1.0e-4
+  dt_obs: 0.005
+  K: 200
+  amplitude: 0.5
