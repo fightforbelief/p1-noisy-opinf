@@ -80,17 +80,47 @@ def test_iv_consistency():
         assert large_error < small_error
 
 
+def _population_iv(trajs, sigma: float) -> tuple[np.ndarray, np.ndarray]:
+    """干净配对上的总体 IV 矩解。mu 只加在对角二次特征上。"""
+    width = features(trajs[0][:1]).shape[1]
+    mu = np.zeros(width, dtype=np.float64)
+    mu[diag_quad_rows(3)] = sigma**2
+    instruments, design, outputs = [], [], []
+    for traj in trajs:
+        instruments.append(features(traj[:-2]) + mu)
+        design.append(features(traj[1:-1]) + mu)
+        outputs.append(traj[2:])
+    w_bar = np.vstack(instruments)
+    z_bar = np.vstack(design)
+    moment = w_bar.T @ z_bar
+    return np.linalg.solve(moment, w_bar.T @ np.vstack(outputs)), mu
+
+
+def _assert_population_intercept(trajs, sigma: float) -> None:
+    operator, mu = _population_iv(trajs, sigma)
+    target = -mu @ OPERATOR
+    gap = operator[-1] - OPERATOR[-1]
+    assert np.linalg.norm(gap - target) / np.linalg.norm(target) < 0.1
+    corrected = np.array(operator, dtype=np.float64, copy=True)
+    corrected[-1] += (sigma**2) * operator[diag_quad_rows(3)].sum(axis=0)
+    assert np.linalg.norm(corrected[-1] - OPERATOR[-1]) < 0.1 * np.linalg.norm(target)
+
+
+def _assert_fit_correction(trajs, sigma: float) -> None:
+    noisy = _noisy(trajs, sigma, (11, 61))
+    for method in ("iv", "iv2"):
+        raw = fit(noisy, method, sigma2=sigma**2, correct_intercept=False).O
+        corrected = fit(noisy, method, sigma2=sigma**2).O
+        expected = (sigma**2) * raw[diag_quad_rows(3)].sum(axis=0)
+        assert np.allclose(corrected[-1] - raw[-1], expected, rtol=1e-10, atol=1e-12)
+        assert np.allclose(corrected[:-1], raw[:-1], rtol=1e-10, atol=1e-12)
+
+
 def test_iv_intercept_correction():
     trajs = rollout(OPERATOR, 250, 200, (11, 6))
     sigma = 0.05 * _rms(trajs)
-    gen = rng(11, 61)
-    noisy = [add_white(traj, sigma, gen) for traj in trajs]
-    raw = fit(noisy, "iv", sigma2=sigma**2, correct_intercept=False).O
-    corrected = fit(noisy, "iv", sigma2=sigma**2).O
-    target = -(sigma**2) * OPERATOR[diag_quad_rows(3)].sum(axis=0)
-    raw_gap = raw[-1] - OPERATOR[-1]
-    assert np.linalg.norm(raw_gap - target) / np.linalg.norm(target) < 0.1
-    assert np.linalg.norm(corrected[-1] - OPERATOR[-1]) < 0.1 * np.linalg.norm(target)
+    _assert_population_intercept(trajs, sigma)
+    _assert_fit_correction(trajs, sigma)
 
 
 def test_ridge_lambda_zero():
