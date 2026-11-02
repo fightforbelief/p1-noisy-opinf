@@ -411,3 +411,83 @@ E8 在 φ=0 时 `theory_gap_rel` 的填报口径仍未决定。本次没有涉�
 **本段提交说明：** `fix: fit oracle on clean training trajectories`
 
 **仍未决定：** E8 在 φ=0 时 `theory_gap_rel` 的填报口径。本次没有改这个指标。
+
+## 正式 E0 — 2026-11-02
+
+**最终状态：** `E0_SANITY_CHECK_FAILED`
+
+Gate A 已单独提交：`ae168aaef3a4e8f6aba13daa57a9809177673d0f`，说明是 `fix: fit oracle on clean training trajectories`。E0 在这个提交之后运行。没有通过，所以没有做 E0 提交，也没有 push，没有启动 E1。
+
+**运行：** HANQING-WIN，`scripts/e0_sanity.py`，项目 `.venv` 的 Python 3.12.10。HEAD `ae168aaef3a4e8f6aba13daa57a9809177673d0f`。工作区当时只有未跟踪的 `scripts/e0_sanity.py`。墙钟时间 12.638672099914402 秒。数据由本次进程的 `simulate` / `rollout` 生成，没有读 `data/` 缓存。配置哈希：S1 `096ef3739956fafc85587838b262b774c8f7eb033ddd76c1671918998f373986`，S2 `219c52f59203ad7fb468cec9e59f4e47d58f632105a0056e54cef5d252ba4dfa`，S3 `b3f4a91b39704fe5f1b0c39d2bfc124abbfcb59d34a87e3caed9ac0d164cd23e`。
+
+04 没有规定零噪声一致性和 σ² 估计的训练条数与 POD 秩。本次使用 `n_train=10`。S2/S3 的秩是 8。S2 快照数 `K_tot=2010`，`N=256`，满足 `K_tot >= 2N`。
+
+**分辨率：** S2 最大相对 L2 `9.756859013484725e-09`，阈值 `1e-4`，通过。S3 `0.0004904044747538911`，阈值 `1e-3`，通过。S3 在 `t=1` 的范数比中位数 `0.46985669661102464`，阈值 `0.2`，通过。S2 的 99% / 99.9% / 99.99% POD 秩是 6 / 10 / 14，S3 是 11 / 18 / 27。99% 秩不同。没有改物理参数。
+
+**S1 真算子：** 残差最大值 `1.582067810090848e-14`（阈值 `1e-11`），`||c_true||` `9.07314923274536e-16`（阈值 `1e-12`），`ep_violation` `7.064961743537406e-15`（阈值 `1e-12`）。三项都通过。
+
+**零噪声：** S1 上 ols、mc、mc_psd、iv、iv2 相对 oracle 的误差分别是 `0`、`6.017318142555264e-12`、`3.5815203955181153e-11`、`9.565224260750429e-12`、`4.638941946116838e-13`，都小于 `1e-8`。S3 上 ols、mc、mc_psd 是 `0`、`4.584926680894034e-13`、`5.389390294099423e-12`，通过。S2 上 ols 是 `0`，mc 是 `6.375601524926835e-12`，通过；`mc_psd` 是 `0.0030837080887182624`，没有通过。S2/S3 没有把 IV 列入这项验收。
+
+失败原因留在诊断里，没有改代码。同一配置重算：OLS 与 oracle 的 Gram 条件数是 `165946741.94092986`。`mc_psd` 的 `gram_min_eig` 是 `1.2136297572286345e-05`，`n_clipped=1`。现有 `1e-8 λ_max` 截断改动了一个特征值，相对误差落到 `0.003083708129612571`。`mc` 在 σ²=0 时没有截断，误差是 `6.490971852191922e-12`。没有放宽 `1e-8`，也没有改截断。
+
+**S2 σ²：** 只报告，没有另设通过线。`beta=0.12736318407960198`。
+
+| rho | sigma2_true | sigma2_estimated | relative_error | 干净谱第 N/2 项 / σ² |
+|---|---|---|---|---|
+| 0.01 | 5.7372844511005595e-06 | 6.050575699663931e-06 | 0.05460619065231706 | 2.722369953455067e-22 |
+| 0.05 | 0.00014343211127751398 | 0.00014925730055461968 | 0.040612867127327305 | 1.1035912765850053e-23 |
+| 0.2 | 0.0022949137804402237 | 0.0023548902203767556 | 0.02613450685935 | 6.994765761622271e-25 |
+
+**pytest：** 76 通过，0 失败，23.07 秒。
+
+**结果文件：** `results/e0/meta.json`、`solver_acceptance.json`、`s1_true_operator.json`、`zero_noise.json`、`s2_sigma2.json`、`summary.json`。`summary.json` 的 `pass` 是 false。这些文件保留。没有覆盖旧的 E0 输出，因为运行前目录不存在。
+
+**未决：** 跨估计器发散阈值是否可比，仍留到 E1–E8 之前单独决定。E8 在 φ=0 时 `theory_gap_rel` 的口径仍未决定。S2 上 `mc_psd` 在 σ²=0 时被既有特征值截断推离 oracle，等待负责人决定。
+
+## E0 MC-PSD Zero-Noise Amendment and Retry
+
+**最终状态：** `E0_SANITY_CHECK_COMPLETE_AFTER_ZERO_NOISE_AMENDMENT`
+
+上一节的失败记录保持原样。原始 `results/e0/` 没有被覆盖。重跑写入 `results/e0_retry1/`。两组 JSON 都被 `.gitignore` 的 `results/` 忽略，没有进入 Git。
+
+**原始失败原因：** 02 要求 σ²=0 时 `mc_psd` 与 oracle 的相对误差小于 `1e-8`，同时又规定 `mc_psd` 始终把小于 `1e-8 λ_max` 的特征值截断。S2 干净 Gram 的 `λ_max=2013.9790491107137`，`λ_min=1.2136297572304265e-05`，下限 `2.0139790491107137e-05`。45 个特征值里只有最小的那一个低于下限。修改前普通 MC 的误差是 `6.490971852191922e-12`，`n_clipped=0`；MC-PSD 的误差是 `0.003083708129612571`，`n_clipped=1`。失败来自这次截断，不是 Hermite 或交叉矩。
+
+**原始结果 SHA-256：**
+
+| 文件 | 字节 | SHA-256 |
+|---|---|---|
+| `results/e0/meta.json` | 800 | `b596af93b6bfefc3a7a3ed1e5ebe4fa2bc4df4071939f272a020a2cc7aca0dcc` |
+| `results/e0/solver_acceptance.json` | 2105 | `cb3d6601a4f0ba6a4b36b901d23e363e472fca135845d204fdbed3a1a84c82ac` |
+| `results/e0/s1_true_operator.json` | 1173 | `2e3bba6324fbed6be58cdc04fe0162d2b02f9921d059069808ae8aa14c105daf` |
+| `results/e0/zero_noise.json` | 3769 | `f267f5a08549cb90ec201c8f38cab291860e3c670e4ac73b2b9e068fcf64c41f` |
+| `results/e0/s2_sigma2.json` | 2080 | `0a4d580e58a07175c5f3c2ab59e7de0929c7e3738e422af924d390f4dd4f0cd7` |
+| `results/e0/summary.json` | 1010 | `3251504f1bc645ed64d4beb959ba17ea0f033a7d735a11d9b2525a665c8a99df` |
+
+重跑之后这些哈希没有变化。`summary.json` 的 `pass` 仍是 false。S2 `mc_psd` 的原始误差仍是 `0.0030837080887182624`。
+
+**负责人约定：** σ² 严格等于 0 时，`mc_psd` 使用与 `mc` 相同的未截断矩求解，`n_clipped=0`。σ² 严格为正时，`δ=1e-8` 的谱截断不变。很小但非零的 σ² 不当作 0。不用条件数决定是否截断。Gram 奇异时仍返回 NaN。
+
+**修订提交：** `3b8f7d5db2ab927b6e2da6e4c4b1f095cb50f827`，`fix: define MC-PSD zero-noise identity`。只包含 `estimators.py`、02 第 3.2 节新增的一段、`tests/test_estimators.py`。
+
+修订前 SHA-256：`estimators.py` `26c5458fb6f054e3abec754f39e469853e6c755a289d1e7bf1b8a5b70fd3c71c`，测试 `79e031d782022fb80df7b2c7fc64efa583a66a8d5f7d89da7190b6440ea0538a`，02 `6b3edefca1ef1c782f75eca8960fc6feb3bc04a7fb34e81f75d51f3bced64eb1`。
+
+修订后 SHA-256：`estimators.py` `a4716e630850e93bafc0acb55197ad4e7dfef0758c8ba4c06a32ccccc0e381c4`，测试 `3d70521680a4b83bae19af78670cfc4858136ef55d9729af4e8b78bb90d07fb3`，02 `bd1ff6f50ba9add5ae4ad10149a552b2d117d28f38ad461d157c6f5839a17e8f`。
+
+**测试：** 新增零噪声等价、S2 病态 Gram、正噪声截断与不截断、很小正 σ² 仍截断、奇异矩返回 NaN。完整 pytest 82 通过，0 失败，25.20 秒。旧的 76 项仍在。
+
+**重跑：** 同一 `scripts/e0_sanity.py`，输出目录改为 `results/e0_retry1/`。配置仍是 `n_train=10`、`r=8`、原阈值、原种子。HEAD `3b8f7d5db2ab927b6e2da6e4c4b1f095cb50f827`。墙钟 12.598161600064486 秒。`summary.json` 的 `pass` 是 true。
+
+S2 `mc_psd` 的误差从 `0.0030837080887182624` 变为 `6.375601524926835e-12`，与 MC 相同，`n_clipped=0`。S1 与 S3 的 `mc_psd` 也与对应的 MC 相同，分别是 `6.017318142555264e-12` 和 `4.584926680894034e-13`。分辨率、S1 真算子和三组 σ² 估计与原始失败运行的数值一致。正噪声截断规则没有改。
+
+**重跑 SHA-256：**
+
+| 文件 | 字节 | SHA-256 |
+|---|---|---|
+| `results/e0_retry1/meta.json` | 824 | `4cfc8860855fa0da84f32fe345c6c95f69548d08a6c9a8ea6572891627efc9f3` |
+| `results/e0_retry1/solver_acceptance.json` | 2129 | `0467dec85498a6ad0f42c2289a6889c57354c224911adef2071555be4bff65c6` |
+| `results/e0_retry1/s1_true_operator.json` | 1197 | `371121a2683a12591d01be9e52843331aa2ffd306e96b8f169697781ada9f20f` |
+| `results/e0_retry1/zero_noise.json` | 4098 | `43e43b7aef7322abeb0636c0c21186bca942e7c072b21b0e175af0d15d278c8e` |
+| `results/e0_retry1/s2_sigma2.json` | 2104 | `4ce552de5b86134bf62ee2e57135b8bdf39db535253e2f7d4660ef2659300be6` |
+| `results/e0_retry1/summary.json` | 1033 | `a0b96c7f1d486c0c9e0b55ced1b57b1b5d50be2e94c83ad23f6c7852f0e4969a` |
+
+没有 push。没有启动 E1–E8。跨估计器发散阈值，以及 E8 在 φ=0 时的 `theory_gap_rel`，仍然未决。
