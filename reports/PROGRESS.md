@@ -535,3 +535,13 @@ S2 `mc_psd` 的误差从 `0.0030837080887182624` 变为 `6.375601524926835e-12`�
 正式运行前的提交是 `8f90c7e6c85252a606767c1920b44d6902caf1ab`。先导 `results/e4_pilot/` 为 48 行，外推 116.62390450015664 秒，低于 4 小时，R=10 未改。正式目录 `results/e4/` 有 1200 行，拟合失败 0，网格墙钟 280.15501830005087 秒。运行时 HEAD 就是上述提交。pytest 为 123 passed、0 failed。
 
 `r*_val` 和描述性的 `r*_test` 对四个估计器都不随 rho 上升。SNR 规则没有在全部估计器和全部 rho 上落在 `r*_val` 的 ±2 个模态内。这是科学差异，不是归档失败。分析见 `reports/E4_RANK_NOISE_TRADEOFF.md`，哈希见 `reports/E4_OUTPUT_MANIFEST.md`。没有启动 E5–E8。
+
+## E4 事后审计
+
+状态：`E4_AUDIT_PASS_WITH_SCIENTIFIC_DISCREPANCY`。没有重跑 E4，没有改 `results/e4/`。
+
+1200 行、120 个汇总、60 条选秩和 3900 条 Ridge 分数都与网格一致。拟合失败 0，非有限算子 0。199 条单次重复的测试中位数是 inf，汇总后有 21 个 inf 格子。选秩从 `rank_curves.csv` 独立重算，与 `rank_selection.csv` 一致，严格并列数为 0。另有 10 个验证比较的相对差距小于 5%，其中 Ridge 在 rho=0.2 的带噪验证只以约 0.28% 的差距选中 r=16，10 次重复里只有 5 次选它。
+
+SNR 的 lower central median 写在运行前的提交 `8f90c7e` 里。这次 10 次重复的 `r_snr` 完全相同，所以它和普通中位数没有差别。四个 κ 都没有在 20 个估计器–噪声组合上全部落进 ±2。MC 在 r=16 的校正 Gram 最小特征值为负，谱半径明显高于参考，发散发生在前几步。IV2 的一阶段 R² 没有进入归档，谱半径仍接近参考，机制标记为 `MECHANISM_NOT_IDENTIFIED`。
+
+派生表在 `reports/e4_audit/`，稳定性图是 `figures/fig_e4_rank_stability.png`。全文是 `reports/E4_POSTRUN_AUDIT_AND_SCIENTIFIC_INTERPRETATION.md`。pytest 123 passed。没有启动 E5。

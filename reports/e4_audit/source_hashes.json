@@ -1,0 +1,87 @@
+[
+  {
+    "path": "results/e4/bases.npz",
+    "bytes": 1703269,
+    "sha256": "b0d2a3dade6d08a6b650ecd09bcb4be5a07f99133847bb99838057cc2856a2ff"
+  },
+  {
+    "path": "results/e4/basis_audit.csv",
+    "bytes": 86499,
+    "sha256": "b6fc81cdf9aecd4188c1bf8b3f0616fe4acb4bdc6b6393bbb3761c2ba4d4d519"
+  },
+  {
+    "path": "results/e4/failures.json",
+    "bytes": 4,
+    "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+  },
+  {
+    "path": "results/e4/meta.json",
+    "bytes": 1651,
+    "sha256": "b3f827ed2086b67ffdb065946517b5b538b895fb0d4b5df742c9c04b408ce0aa"
+  },
+  {
+    "path": "results/e4/operators.npz",
+    "bytes": 9583231,
+    "sha256": "993ea1082615fdf4ce066096b83143f49d878da8589279f5d445d7a06bea473b"
+  },
+  {
+    "path": "results/e4/output_manifest.json",
+    "bytes": 2539,
+    "sha256": "adc23174d07ffb3bfe38121f280968d78c92084d82c88251f86d9dd06404ebc7"
+  },
+  {
+    "path": "results/e4/rank_curves.csv",
+    "bytes": 75147,
+    "sha256": "3fdb00c55e1d66a7b9f46da196efb4e5ac51e75227855af56ce4bd0e1e541143"
+  },
+  {
+    "path": "results/e4/rank_selection.csv",
+    "bytes": 3624,
+    "sha256": "517532638f2295736e637a371de890a17a573a9ca331f964746ca855f1ba537e"
+  },
+  {
+    "path": "results/e4/ridge.csv",
+    "bytes": 162567,
+    "sha256": "d1bc9e610dfea0030c9af96f11cf06d17d200115425ed9b8a7f9b1bf7e2c21e5"
+  },
+  {
+    "path": "results/e4/rollout_details.npz",
+    "bytes": 1213510,
+    "sha256": "71fc968ee8bed70b567ff22aa8d17d26f33f0494274ee12c0484c277025bc2ee"
+  },
+  {
+    "path": "results/e4/runs.csv",
+    "bytes": 536468,
+    "sha256": "27b6635b154c5ce21def1c5eea77d974e5178804d00a3ec88d5ba5a9e0203147"
+  },
+  {
+    "path": "results/e4/runtime_end.json",
+    "bytes": 3468,
+    "sha256": "562428fcfb3a3af4b26dbc2fa38721c8c5ce05d93a47c3d7fd0bcbcc3872e987"
+  },
+  {
+    "path": "results/e4/runtime_start.json",
+    "bytes": 3470,
+    "sha256": "04b2234f68472b15b1f9936b3b4a639c9e7825ccbfa3bb9ce725e47ed6a0e2fa"
+  },
+  {
+    "path": "results/e4/sigma2_estimation.csv",
+    "bytes": 5400,
+    "sha256": "ce1a0d961c59f8532c4ead1b65f92a0c24e8f0bd6e125ca26a35c07bbb3da9b4"
+  },
+  {
+    "path": "results/e4/snr_rank.csv",
+    "bytes": 194050,
+    "sha256": "0ab424d3351d2783f0c3c4ec895b9ce34e9da7d96fdb480fca14731cdb693e64"
+  },
+  {
+    "path": "results/e4/summary.csv",
+    "bytes": 181588,
+    "sha256": "4196bd52b620d27d048b4e3e38541f63e64c7705c0a2ab705791c3e4b0aeb8cb"
+  },
+  {
+    "path": "results/e4/validation_details.npz",
+    "bytes": 290753,
+    "sha256": "511a75d23d3a49ffb22d05e33b45537c3b5b0c607a0b9f510d9ba5d1781d5cb6"
+  }
+]
