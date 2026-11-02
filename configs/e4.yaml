@@ -1,0 +1,22 @@
+# E4：S2 noisy POD 上的秩与噪声权衡。网格与 04 的 E4 节一致。
+experiment: E4
+system: s2
+n_train: 30
+n_val: 20
+n_test: 50
+basis: noisy
+r: [4, 6, 8, 10, 12, 16]
+r_max: 16
+rho: [0.01, 0.02, 0.05, 0.1, 0.2]
+estimators: [ols, ridge, mc, iv2]
+sigma2_source: est_trailing
+replicates: 10
+experiment_id: 4
+rho_grid: [0, 0.01, 0.02, 0.05, 0.1, 0.2]
+kappa: [1, 4, 16, 64]
+validation_offset: 100
+seed_pattern: "2,4,4,rho_index,replicate,traj"
+tie_rule: smaller_r
+rank_aggregate: median_of_replicate_medians
+snr_plot_aggregate: lower_central_median_of_nonempty
+threshold_rule: "1e3 * max abs of the clean projected training states on that rank; shared by every estimator"

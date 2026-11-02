@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 
 import numpy as np
@@ -44,6 +45,8 @@ def test_undefined_metric_is_not_success():
 
 def test_s2_smoke_pipeline(tmp_path, monkeypatch):
     monkeypatch.setenv("NOISYOPINF_DATA", str(tmp_path / "unused-cache"))
+    official = Path(__file__).resolve().parents[1] / "results" / "e3" / "runs.csv"
+    before = _file_fingerprint(official)
     case = prepare_case(rank=4, n_train=3, n_obs=40, rho=0.05, replicate=0)
     rows = evaluate_case(case)
     path = tmp_path / "runs.csv"
@@ -54,8 +57,14 @@ def test_s2_smoke_pipeline(tmp_path, monkeypatch):
     _assert_values(loaded, case)
     _assert_oracle_is_not_ols(case, loaded)
     _assert_every_fit_uses_its_training_values(case)
-    official = Path(__file__).resolve().parents[1] / "results" / "e3" / "runs.csv"
-    assert not official.exists()
+    assert _file_fingerprint(official) == before
+    assert path.resolve() != official.resolve()
+
+
+def _file_fingerprint(path: Path):
+    if not path.exists():
+        return None
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def _assert_schema(loaded: list[dict]) -> None:
