@@ -527,3 +527,11 @@ S2 `mc_psd` 的误差从 `0.0030837080887182624` 变为 `6.375601524926835e-12`�
 参考是各 POD 基上的 `O_clean`。noisy basis 的参考随重复改变，所以该基不报告跨重复偏差。rho≥0.02 时 MC、IV、IV2 相对 OLS 的算子误差配对区间整段为负；rho=0.01 时只有 MC 如此。clean basis、rho=0.2 的 `sd_O_rel` 最大约 0.023，没有复现 E2 在 n_train=10 上的方差爆炸。MC-PSD 的 `n_clipped` 全是 0。trailing median 的 σ² 相对误差小于 Gavish–Donoho，但这个差别几乎不改变算子误差。Oracle 的全视界中位数约为 0.134，与池化投影误差同一量级。H3 的谱半径纠正只表现为约 0.0017 的偏移，MC/IV 还落到参考的另一侧。H4 在高噪声下 MC/IV 的能量违反小于 OLS，但 `O_clean` 本身的违反已经约为 0.044。
 
 图是 `figures/fig_e3_operator_err.png`、`fig_e3_rollout.png`、`fig_e3_basis_effect.png`、`fig_e3_sigma_source.png`。分析见 `reports/E3_BURGERS_POD_COMPARISON.md`，哈希见 `reports/E3_OUTPUT_MANIFEST.md`。没有启动 E4–E8。
+
+## E4 秩与噪声的权衡
+
+状态：`E4_EXPERIMENT_COMPLETE_WITH_SCIENTIFIC_DISCREPANCY`。E0–E3 的归档和已验收数学实现没有改，也没有重跑。
+
+正式运行前的提交是 `8f90c7e6c85252a606767c1920b44d6902caf1ab`。先导 `results/e4_pilot/` 为 48 行，外推 116.62390450015664 秒，低于 4 小时，R=10 未改。正式目录 `results/e4/` 有 1200 行，拟合失败 0，网格墙钟 280.15501830005087 秒。运行时 HEAD 就是上述提交。pytest 为 123 passed、0 failed。
+
+`r*_val` 和描述性的 `r*_test` 对四个估计器都不随 rho 上升。SNR 规则没有在全部估计器和全部 rho 上落在 `r*_val` 的 ±2 个模态内。这是科学差异，不是归档失败。分析见 `reports/E4_RANK_NOISE_TRADEOFF.md`，哈希见 `reports/E4_OUTPUT_MANIFEST.md`。没有启动 E5–E8。
