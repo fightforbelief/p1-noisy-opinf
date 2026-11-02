@@ -1,0 +1,16 @@
+# E3：S2 Burgers POD 上七个估计器的比较。网格与 04 的 E3 节一致。
+system: s2
+r: 8
+n_train: 30
+n_val: 20
+n_test: 50
+rho: [0, 0.01, 0.02, 0.05, 0.1, 0.2]
+basis: [clean, noisy]
+estimators: [oracle, ols, ridge, mc, mc_psd, iv, iv2]
+sigma2_sources: ["true", est_trailing, est_gd]
+replicates: 20
+experiment_id: 3
+rho_grid: [0, 0.01, 0.02, 0.05, 0.1, 0.2]
+seed_pattern: "2,4,3,rho_index,replicate,traj"
+validation_offset: 100
+threshold_rule: "1e3 * max abs of the clean projected training states on that basis; shared by every estimator and sigma2 source"
