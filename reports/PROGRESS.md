@@ -545,3 +545,11 @@ S2 `mc_psd` 的误差从 `0.0030837080887182624` 变为 `6.375601524926835e-12`�
 SNR 的 lower central median 写在运行前的提交 `8f90c7e` 里。这次 10 次重复的 `r_snr` 完全相同，所以它和普通中位数没有差别。四个 κ 都没有在 20 个估计器–噪声组合上全部落进 ±2。MC 在 r=16 的校正 Gram 最小特征值为负，谱半径明显高于参考，发散发生在前几步。IV2 的一阶段 R² 没有进入归档，谱半径仍接近参考，机制标记为 `MECHANISM_NOT_IDENTIFIED`。
 
 派生表在 `reports/e4_audit/`，稳定性图是 `figures/fig_e4_rank_stability.png`。全文是 `reports/E4_POSTRUN_AUDIT_AND_SCIENTIFIC_INTERPRETATION.md`。pytest 123 passed。没有启动 E5。
+
+## E4 最终科学审计与冻结
+
+状态：`E4_AUDIT_PASS_WITH_SCIENTIFIC_DISCREPANCY`。H6 为 `H6_PARTIALLY_SUPPORTED`。没有重跑 E4，没有改估计器，没有启动 E5。
+
+22/120 个汇总格的滚动中位数低于池化投影参考，全部在 rho≤0.05。用已保存的基前缀和干净测试轨迹重算后，逐条轨迹低于自身投影误差的次数是 0。rho=0.01 和 rho=0.02 的四个 κ 都是 `RIGHT_CENSORED_AT_RANK_16`。四个 κ 的 replicate 级平均绝对差和 ±2 命中是 5.98（24/200）、5.00（24/200）、3.74（31/200）、2.26（106/200）。Ridge 在 rho=0.2 的 noisy validation 误差曲线选 r=16，重复秩的 lower central median 是 12。IV2 高秩发散保持 `MECHANISM_NOT_IDENTIFIED`。5% close 阈值是探索性的。
+
+派生表是 `projection_floor_audit.csv`、`snr_reconciliation.csv`、`snr_replicate_detail.csv`、`rank_stability_final.csv`、`rank_gap_final.csv`。脚本是 `scripts/e4_final_reconciliation.py`。全文仍是 `reports/E4_POSTRUN_AUDIT_AND_SCIENTIFIC_INTERPRETATION.md`。pytest 123 passed、0 failed。
