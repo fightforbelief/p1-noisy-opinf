@@ -491,3 +491,19 @@ S2 `mc_psd` 的误差从 `0.0030837080887182624` 变为 `6.375601524926835e-12`�
 | `results/e0_retry1/summary.json` | 1033 | `a0b96c7f1d486c0c9e0b55ced1b57b1b5d50be2e94c83ad23f6c7852f0e4969a` |
 
 没有 push。没有启动 E1–E8。跨估计器发散阈值，以及 E8 在 φ=0 时的 `theory_gap_rel`，仍然未决。
+
+## E1：OLS 偏差的理论与模拟对照
+
+状态：`E1_EXPERIMENT_COMPLETE_WITH_SCIENTIFIC_DISCREPANCY`。
+
+核对时 HEAD 为 `d6834cc92cf5f7e7220d472941688a4f4ba30c12`，工作区干净。`results/e0/` 六份 JSON 的 SHA-256 与上一节失败记录一致，`pass=false`。`results/e0_retry1/` 六份与上表一致，`pass=true`。清单见 `reports/E0_CLOSEOUT_MANIFEST.md`。
+
+网格是 S1、r=8、rho ∈ {0.02, 0.05, 0.1, 0.2}、n_train ∈ {10, 30, 100}、只做 OLS、R=200，共 2400 次拟合。训练轨迹是同一条 index 0–99 序列的嵌套前缀。噪声键是 `1,4,1,rho_index,replicate,traj`，rho_index 用主网格下标 2、3、4、5。`experiment_id=1` 是本次对 03 未赋值槽位的记录。σ² 由该前缀的 rho/RMS 规则计算，同一配置的 200 次重复共用。
+
+先导是 rho=0.05、n_train=30、replicate 0–9，目录 `results/e1_pilot/`。检查通过。10 次拟合 0.5411713998764753 秒，外推 202.0373226205508 秒，低于 4 小时，网格未缩减。正式运行 16.38159259990789 秒，运行时 HEAD 仍是 `d6834cc92cf5f7e7220d472941688a4f4ba30c12`。2400 行全部 `ols`、`status=ok`，失败数 0。理论矩条件数在 3.32e5 到 9.86e6 之间，12 个极限都有限，诊断求解与 `ols_limit` 的相对差是 0。
+
+`O` 的 `theory_gap_rel` 从 0.007733273489908429（rho=0.1，n_train=100）到 0.04700872169860776（rho=0.05，n_train=10）。n_train=100 时，均值与极限之差的元素 z 分数平方和接近 360 这个矩阵元素数；n_train=10 时该平方和是 1082 到 1825。后者大于 R=200 的重复噪声尺度，对应有限样本下“比值的均值”和“期望矩之比”的差别。A 的偏差范数随 rho 增大；H 在 n_train=10、rho 从 0.1 到 0.2 时略降。`||c_true||=9.07314923274536e-16`，所以 c 的 `theory_gap_abs` 数值很大，分子本身在 1e-6 到 1e-4。没有把 H1 写成已证实或已否定。
+
+误差棒是偏差范数在对角协方差下的 delta-method 标准误的 ±2 倍，不是 `||SE||_F`。第一次写出的 `summary.csv` 没有给含逗号的 `seed_pattern` 加引号，列因此错位。随后只用已归档算子重写了汇总表，没有重拟合；重算的 `O_theory_gap_rel` 与表内值之差的最大值是 0。`runs.csv`、`operators.npz`、`meta.json` 保持原文件。
+
+完整 pytest 在这版代码上是 94 passed，0 failed，24.92 秒。结果目录被忽略。输出哈希见 `reports/E1_OUTPUT_MANIFEST.md`，分析见 `reports/E1_OLS_BIAS.md`。没有启动 E2–E8。没有修改已验收的理论和估计器。
