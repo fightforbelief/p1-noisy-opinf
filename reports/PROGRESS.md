@@ -253,3 +253,46 @@ S1、ETDRK4、S2、S3、数据生成和 POD 都已在远程实现并运行。分
 - `reports/PROGRESS.md`
 
 **最终状态：** `STAGE2_CORE_ESTIMATORS_AND_THEORY_COMPLETE`
+
+## Stage 3 实验基础设施 — 2026-11-02 16:16
+
+**远程 git commit：** 本段与基础设施一起提交。起点是 `59f69b737e9f0a0f4e24f04ddbd3beab51f14544`。
+
+**做了什么：**
+
+1. 增加 `rollout.py`。原坐标迭代 `q_{k+1} = features(q_k) @ O`。轨迹长度是 `n_steps + 1`。非有限的新状态以及其后填 NaN。超过 `10^3 * max_train ||q||_∞` 的有限状态保留原值，其后填 NaN。不裁剪，不重开，不改输入。
+2. 增加 `metrics.py`。实现 02 第 7 节的算子、A、H、常数项、谱半径、能量违反、预测误差、中位数、非发散均值、发散比例、bias、sd、IQR、投影下限，以及 04 的 `rollout_med_h10`、`rollout_med_h50`。bootstrap 比较单独放在这里，不放进估计器。
+3. 增加 `io_utils.py`。`runs.csv` 使用固定列，空值留空，`inf` 保留为发散，NaN 不写成 0。JSON 和 npz 先写临时文件再替换。
+4. 增加 `protocol.py`。同一次重复里训练集和验证集独立加噪，测试轨迹保持干净，ridge 的 λ 只在带噪验证轨迹上选择，并列时取较大的 λ。没有运行 E0–E8。
+
+**测试状态：**
+
+HANQING-WIN，项目 `.venv`，Python 3.12.10。
+
+- `tests/test_rollout.py`：6 通过，0 失败，0.12 秒
+- `tests/test_metrics.py`：6 通过，0 失败，0.06 秒
+- `tests/test_io_utils.py`：4 通过，0 失败，0.09 秒
+- `tests/test_protocol.py`：2 通过，0 失败，0.08 秒
+- 完整 pytest：71 通过，0 失败，19.26 秒
+
+`git diff --check` 退出码 0。
+
+**实验运行：** 未运行。没有启动 E0–E8。不要把 E0 记成已通过。
+
+**已接受的 Stage 2 文件：** 没有改。`theory.py` 的 SHA-256 仍是 `264c777fb42388a298ceda6a2fd600fc55ac43076beb4f1d46af0ede16975a13`。`tests/test_theory.py` 里的 `test_one_dimensional_delta_blocks` 和 `test_quadratic_cross_term_uses_both_sums` 仍在。`estimators.py` 没有改。
+
+**与规格的偏离：**
+
+- `runs.csv` 在 03 第 13 节的列上追加了 04 第 1.1 节点名的 `rollout_med_h10` 和 `rollout_med_h50`，放在 `rollout_med` 后面。
+- 相对误差的分母为 0 时返回 NaN。02 没有规定这个分母。
+- 指标函数的秩取自算子列数。03 第 12 节写了单独的 `r` 参数；算子形状已经是 `(p, r)`。
+- 结果文件默认不覆盖已有文件。调用方传入 `overwrite=True` 才替换。03 没有写覆盖规则。
+- `protocol.py` 只放重复划分和 λ 选择，避免把这些规则写进估计器。
+
+**问题与建议：**
+
+E8 在 φ=0 时 `theory_gap_rel` 的填报口径仍未决定。这次没有改 04 或 05。
+
+**下一步：** 停在这里，不自动开始 E0。
+
+**最终状态：** `STAGE3_EXPERIMENT_INFRASTRUCTURE_COMPLETE`
