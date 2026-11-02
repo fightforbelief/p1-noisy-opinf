@@ -283,3 +283,46 @@ def test_ols_limit_matches_mc():
     bias = np.linalg.norm(limit - operator)
     assert bias > 0.0
     assert np.linalg.norm(mean - limit) < 0.1 * bias
+
+
+def _clean_plus_delta(trajs: list[np.ndarray], delta: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    inputs = np.vstack([traj[:-1] for traj in trajs])
+    outputs = np.vstack([traj[1:] for traj in trajs])
+    encoded = features(inputs)
+    gram = encoded.T @ encoded
+    cross = encoded.T @ outputs
+    clean = np.linalg.solve(gram, cross)
+    return clean, clean + np.linalg.solve(gram, delta)
+
+
+def test_one_dimensional_delta_blocks() -> None:
+    """1 维玩具：线性块 nφσ²，对角二次块系数为 2，常数行为 0。"""
+    trajs = [np.array([[1.0], [2.0], [4.0], [7.0]])]
+    variance, lag = 0.2, 0.5
+    delta = np.zeros((3, 1))
+    delta[0, 0] = 3 * lag * variance
+    delta[1, 0] = 2 * lag * variance * 7.0
+    clean, shifted = _clean_plus_delta(trajs, delta)
+    np.testing.assert_allclose(mc_limit_ar1(trajs, variance, 0.0), clean, atol=1e-12)
+    np.testing.assert_allclose(mc_limit_ar1(trajs, variance, lag), shifted, atol=1e-10)
+    assert delta[2, 0] == 0.0
+
+
+def test_quadratic_cross_term_uses_both_sums() -> None:
+    """2 维玩具：S=(7, 7)，交叉项 φσ²(δ_jb S_i + δ_ib S_j)。"""
+    states = np.array(
+        [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0], [2.0, 0.0], [0.0, 2.0], [1.0, 2.0], [2.0, 1.0], [5.0, 5.0]]
+    )
+    trajs = [states[:5], states[4:]]
+    variance, lag = 0.5, 0.4
+    factor = lag * variance
+    delta = np.zeros((6, 2))
+    delta[0, 0] = 7 * factor
+    delta[1, 1] = 7 * factor
+    delta[2, 0] = 2 * factor * 7.0
+    delta[3] = factor * np.array([7.0, 7.0])
+    delta[4, 1] = 2 * factor * 7.0
+    clean, shifted = _clean_plus_delta(trajs, delta)
+    np.testing.assert_allclose(mc_limit_ar1(trajs, variance, 0.0), clean, atol=1e-12)
+    np.testing.assert_allclose(mc_limit_ar1(trajs, variance, lag), shifted, atol=1e-10)
+    np.testing.assert_allclose(delta[5], 0.0)
