@@ -65,11 +65,18 @@ def read_operators(path) -> dict[str, np.ndarray]:
 
 def _runs_text(rows: list[dict]) -> str:
     buffer = StringIO()
-    writer = csv.DictWriter(buffer, fieldnames=RUN_COLUMNS, lineterminator="\n", extrasaction="ignore")
+    writer = csv.DictWriter(buffer, fieldnames=RUN_COLUMNS, lineterminator="\n", extrasaction="raise")
     writer.writeheader()
     for row in rows:
-        writer.writerow({column: _cell(row.get(column), column) for column in RUN_COLUMNS})
+        writer.writerow(_checked_cells(row))
     return buffer.getvalue()
+
+
+def _checked_cells(row: dict) -> dict:
+    unknown = sorted(set(row) - set(RUN_COLUMNS))
+    if unknown:
+        raise ValueError("unknown result fields: " + ",".join(unknown))
+    return {column: _cell(row.get(column), column) for column in RUN_COLUMNS}
 
 
 def _cell(value, column: str) -> str:
@@ -82,7 +89,7 @@ def _cell(value, column: str) -> str:
         return str(int(value))
     number = float(value)
     if np.isnan(number):
-        return ""
+        return "nan"
     if np.isposinf(number):
         return "inf"
     if np.isneginf(number):
@@ -103,6 +110,8 @@ def _parse_cell(text: str, column: str):
         return None
     if column in _TEXT:
         return text
+    if text == "nan":
+        return float("nan")
     return float(text)
 
 

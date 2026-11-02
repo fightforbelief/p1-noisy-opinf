@@ -296,3 +296,63 @@ E8 在 φ=0 时 `theory_gap_rel` 的填报口径仍未决定。这次没有改 0
 **下一步：** 停在这里，不自动开始 E0。
 
 **最终状态：** `STAGE3_EXPERIMENT_INFRASTRUCTURE_COMPLETE`
+
+## Stage 3 End-to-End Integration Acceptance — 2026-11-02 16:53
+
+**远程 git commit：** 本段与集成测试一起提交。起点是 `1cb6b0ad096eda49f54aca96b233efbf02385190`。
+
+**做了什么：**
+
+1. 新增 `pipeline.py` 和 `tests/test_smoke.py`。用 S2、r=4、n_train=3、K=40、rho=0.05、R=1，验证集 20 条、测试集 50 条，跑 oracle、ols、ridge、mc、mc_psd、iv、iv2。噪声加在全阶状态上再投影。输出写在 pytest 临时目录。
+2. 视界短于 h+1 时，`rollout_err_h` 抛出 ValueError。K=40 的轨迹只有 41 个状态，`rollout_med_h50` 留空，不用 h=40 代替 h=50。
+3. `runs.csv` 遇到未知字段时抛出 ValueError，不再静默丢掉。数学上的 NaN 写成 `nan`，不适用的字段保持空白。
+4. 全部测试轨迹发散时，`rollout_mean_finite` 按定义是 NaN，该行 `status` 仍为 `ok`。这不是拟合失败。
+
+**测试状态：**
+
+HANQING-WIN，项目 `.venv`，Python 3.12.10。
+
+- `test_smoke.py`、`test_metrics.py`、`test_io_utils.py`、`test_protocol.py`：17 通过，0 失败，3.70 秒
+- 完整 pytest：76 通过，0 失败，22.56 秒
+
+`git diff --check` 退出码 0。
+
+**实验运行：** 未运行正式 E0–E8。没有写入 `results/e3`。
+
+**smoke 配置与结果：**
+
+- 系统 S2，物理参数仍来自 `configs/systems.yaml`。观测步数只用这次测试的 K=40。
+- 行数 7，等于 1 个配置 × 7 个估计器 × 1 次重复。
+- `sigma2_true = 7.782203674037263e-05`。`sigma2_source` 对 mc、mc_psd、iv、iv2 是 `true`，对其余估计器是 `na`，对应的 `sigma2_used` 为空白。
+- 配对数：oracle、ols、ridge、mc、mc_psd 为 120；iv 为 117；iv2 为 114。
+- Ridge 的 λ 是 `10.0`。其他行的 `lam` 为空白。
+- 七行 `status` 都是 `ok`，`error` 为空白。
+- `rollout_med_h50` 全部为空白。
+- oracle 与 ols：`diverged_frac=0.66`，`rollout_med=inf`，`rollout_med_h10=inf`，`rollout_mean_finite=1.0235660004976945`。
+- ridge：`diverged_frac=0.12`，`rollout_med=1.0415609357980042`，`rollout_med_h10=0.9923008743688002`，`rollout_mean_finite=1.0649725426658625`。
+- mc、mc_psd、iv：`diverged_frac=1`，`rollout_med=inf`，`rollout_med_h10=inf`，`rollout_mean_finite=nan`。
+- iv2：`diverged_frac=0.74`，`rollout_med=inf`，`rollout_med_h10=inf`，`rollout_mean_finite=1.2495128347380786`。
+- `inf` 是发散轨迹的误差，参加了中位数。没有使用惩罚分数。
+
+**五项已接受的偏离：**
+
+- `rollout_med_h10` 和 `rollout_med_h50` 仍保留。
+- 相对误差分母为 0 时仍返回 NaN。这次 smoke 的算子误差没有碰到这个分母。
+- 秩仍取自算子列数。
+- 结果文件默认仍不覆盖。
+- 重复划分和 λ 选择仍在 `protocol.py`，没有写进估计器。
+
+**已接受的 Stage 2 文件：** 没有改。`theory.py` 的 SHA-256 仍是 `264c777fb42388a298ceda6a2fd600fc55ac43076beb4f1d46af0ede16975a13`。`estimators.py` 没有改。
+
+**与规格的偏离：**
+
+- 这一行的 `exp` 写成 `smoke`，避免把它记成正式 E3。basis 只用 `clean`，σ² 只用真实值，没有跑 E3 的 basis × σ² 网格。
+- 验证集 20 条、测试集 50 条沿用 04 第 1.1 节。05 第 7 节没有另行规定这两个数量。
+
+**问题与建议：**
+
+E8 在 φ=0 时 `theory_gap_rel` 的填报口径仍未决定。
+
+**下一步：** 可以开始准备 E0。这次没有进入 E0。
+
+**最终状态：** `STAGE3_END_TO_END_INTEGRATION_COMPLETE`

@@ -76,13 +76,18 @@ def ep_violation(O_hat: np.ndarray, snapshots: np.ndarray) -> float:
 
 
 def rollout_err_h(predicted: np.ndarray, truth: np.ndarray, h: int, V: np.ndarray | None = None) -> float:
-    """视界 h 含下标 0 到 h。窗口内出现非有限值时返回 inf。
+    """视界 h 含下标 0 到 h，共 h+1 个状态。窗口内出现非有限值时返回 inf。
 
+    轨迹短于 h+1 时抛出 ValueError，不用更短的窗口代替该视界。
     V 为 None 时比较降阶状态。给出 V (N, r) 时，truth 是全阶 (T, N)。
     """
-    window = slice(0, int(h) + 1)
-    pred = np.asarray(predicted, dtype=np.float64)[window]
-    ref = np.asarray(truth, dtype=np.float64)[window]
+    need = int(h) + 1
+    pred_all = np.asarray(predicted, dtype=np.float64)
+    ref_all = np.asarray(truth, dtype=np.float64)
+    if pred_all.shape[0] < need or ref_all.shape[0] < need:
+        raise ValueError(f"horizon {int(h)} requires {need} states")
+    pred = pred_all[:need]
+    ref = ref_all[:need]
     if not np.isfinite(pred).all() or not np.isfinite(ref).all():
         return float("inf")
     if V is not None:

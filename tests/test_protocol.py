@@ -30,6 +30,18 @@ def test_noise_is_independent_and_test_stays_clean():
     assert len(noisy_train) == len(train)
 
 
+def test_lambda_grid_and_paired_bootstrap_keep_replicate_alignment():
+    import numpy as np
+    from noisyopinf.metrics import bootstrap_interval, paired_median
+    grid = np.logspace(-10, 2, 13)
+    np.testing.assert_allclose(LAMBDAS, grid)
+    gaps = paired_median([3.0, 1.0, 2.0], [1.0, 1.0, 0.0])
+    assert gaps == np.median([2.0, 0.0, 2.0])
+    first = bootstrap_interval([2.0, 0.0, 2.0], rng(0, 77))
+    second = bootstrap_interval([2.0, 0.0, 2.0], rng(0, 77))
+    assert first == second
+
+
 def test_larger_lambda_wins_ties_and_selection_ignores_test():
     assert LAMBDAS[larger_lambda_index([1.0, 1.0, 2.0])] == LAMBDAS[1]
     assert LAMBDAS[larger_lambda_index([2.0, 1.0, 1.0])] == LAMBDAS[2]

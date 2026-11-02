@@ -40,11 +40,24 @@ def test_csv_round_trip_keeps_blanks_and_inf(tmp_path):
     loaded = read_runs(path)[0]
     assert list(loaded) == list(RUN_COLUMNS)
     assert loaded["sigma2_true"] is None
-    assert loaded["rollout_mean_finite"] is None
+    assert np.isnan(loaded["rollout_mean_finite"])
     assert loaded["rollout_med"] == np.inf
     assert loaded["status"] == "failed"
     assert loaded["err_O_rel"] == 0.25
     assert "0" not in path.read_text(encoding="utf-8").splitlines()[1].split(",")[2:4]
+
+
+def test_unknown_field_is_rejected(tmp_path):
+    path = tmp_path / "runs.csv"
+    row = _row()
+    row["theory_gap_rel"] = 0.5
+    try:
+        write_runs(path, [row])
+    except ValueError as exc:
+        assert "theory_gap_rel" in str(exc)
+        assert not path.exists()
+    else:
+        raise AssertionError("unknown field was dropped")
 
 
 def test_existing_file_is_not_overwritten(tmp_path):

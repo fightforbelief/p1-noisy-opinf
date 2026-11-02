@@ -89,6 +89,21 @@ def test_horizon_median_and_failure_values():
     assert named["rollout_med_h50"] == np.inf
 
 
+def test_short_horizon_is_rejected_and_h50_uses_51_states():
+    import pytest
+    prefix = np.ones((52, 1))
+    predicted = prefix.copy()
+    predicted[-1, 0] = 0.0
+    assert rollout_err_h(predicted, prefix, 50) == 0.0
+    changed = prefix.copy()
+    changed[50, 0] = 3.0
+    assert rollout_err_h(changed, prefix, 50) == 2.0 / np.sqrt(51.0)
+    with pytest.raises(ValueError, match="50"):
+        rollout_err_h(np.ones((50, 1)), np.ones((50, 1)), 50)
+    with pytest.raises(ValueError, match="10"):
+        rollout_err_h(np.ones((10, 1)), np.ones((10, 1)), 10)
+
+
 def test_full_order_window_uses_basis():
     basis = np.array([[1.0], [0.0]])
     predicted = np.ones((3, 1))
