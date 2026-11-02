@@ -99,8 +99,15 @@ def prepare_case(rank: int, n_train: int, n_obs: int, rho: float, replicate: int
     )
 
 
+def training_trajectories(case: SmokeCase, method: str) -> list:
+    """oracle 用干净训练轨迹。其余估计器共用该重复的带噪训练轨迹。"""
+    if method == "oracle":
+        return case.clean_train_q
+    return case.noisy_train_q
+
+
 def evaluate_case(case: SmokeCase) -> list[dict]:
-    """七个估计器共用同一份带噪训练轨迹。只有 ridge 读取验证轨迹。"""
+    """带噪估计器共用同一份训练轨迹。只有 ridge 读取验证轨迹。"""
     chosen = select_ridge_lambda(case.noisy_train_q, case.noisy_val_q, case.threshold)
     return [_one_row(case, method, chosen) for method in ESTIMATORS]
 
@@ -123,13 +130,14 @@ def _project_all(fields, basis: np.ndarray) -> list[np.ndarray]:
 def _one_row(case: SmokeCase, method: str, chosen: float) -> dict:
     lam = chosen if method == "ridge" else None
     variance = case.sigma2 if method in SIGMA_METHODS else None
-    result = fit(case.noisy_train_q, method, sigma2=variance, lam=lam)
+    train_q = training_trajectories(case, method)
+    result = fit(train_q, method, sigma2=variance, lam=lam)
     row = _identity(case, method, result.n_pairs, lam, result.fit_seconds, result.diagnostics)
     if not np.isfinite(result.O).all():
         row["status"] = "failed"
         row["error"] = str(result.diagnostics.get("error", "non-finite operator"))
         return row
-    _fill_metrics(row, case, result.O)
+    _fill_metrics(row, case, result.O, threshold_from_train(train_q))
     status, reason = judgement(row, _applicable(case, method))
     row["status"] = status
     row["error"] = reason
@@ -151,7 +159,7 @@ def _identity(case: SmokeCase, method: str, n_pairs: int, lam, seconds: float, d
     return row
 
 
-def _fill_metrics(row: dict, case: SmokeCase, operator: np.ndarray) -> None:
+def _fill_metrics(row: dict, case: SmokeCase, operator: np.ndarray, limit: float) -> None:
     reference = case.reference
     train_q = np.vstack(case.clean_train_q)
     test_q = np.vstack(case.clean_test_q)
@@ -165,14 +173,14 @@ def _fill_metrics(row: dict, case: SmokeCase, operator: np.ndarray) -> None:
     row["ep_violation"] = ep_violation(operator, test_q)
     row["ep_violation_ref"] = ep_violation(reference, test_q)
     row["proj_floor"] = proj_floor(case.basis, test_u)
-    _fill_rollout(row, case, operator)
+    _fill_rollout(row, case, operator, limit)
 
 
-def _fill_rollout(row: dict, case: SmokeCase, operator: np.ndarray) -> None:
+def _fill_rollout(row: dict, case: SmokeCase, operator: np.ndarray, limit: float) -> None:
     errors, flags, early = [], [], []
     for reduced, field in zip(case.clean_test_q, case.clean_test_u, strict=True):
         steps = int(reduced.shape[0] - 1)
-        predicted, diverged = rollout(operator, reduced[0], steps, case.threshold)
+        predicted, diverged = rollout(operator, reduced[0], steps, limit)
         errors.append(float("inf") if diverged else rollout_err_h(predicted, field, steps, case.basis))
         flags.append(diverged)
         early.append(rollout_err_h(predicted, field, 10, case.basis))

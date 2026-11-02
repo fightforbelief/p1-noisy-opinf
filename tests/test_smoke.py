@@ -6,8 +6,18 @@ from pathlib import Path
 
 import numpy as np
 
+import noisyopinf.pipeline as pipeline
+from noisyopinf.estimators import fit
 from noisyopinf.io_utils import RUN_COLUMNS, read_runs, write_runs
-from noisyopinf.pipeline import ESTIMATORS, N_TEST, N_VAL, judgement, prepare_case, evaluate_case
+from noisyopinf.pipeline import (
+    ESTIMATORS,
+    N_TEST,
+    N_VAL,
+    evaluate_case,
+    judgement,
+    prepare_case,
+    training_trajectories,
+)
 from noisyopinf.protocol import LAMBDAS, noise_replicate
 
 SPEC_COLUMNS = (
@@ -42,6 +52,8 @@ def test_s2_smoke_pipeline(tmp_path, monkeypatch):
     _assert_schema(loaded)
     _assert_protocol(case)
     _assert_values(loaded, case)
+    _assert_oracle_is_not_ols(case, loaded)
+    _assert_every_fit_uses_its_training_values(case)
     official = Path(__file__).resolve().parents[1] / "results" / "e3" / "runs.csv"
     assert not official.exists()
 
@@ -63,6 +75,57 @@ def _assert_protocol(case) -> None:
     assert len(case.noisy_val_u) == N_VAL and len(case.clean_test_u) == N_TEST
     assert not np.allclose(case.noisy_train_u[0], case.train_u[0])
     assert not np.allclose(case.noisy_train_u[0], case.noisy_val_u[0])
+
+
+def _assert_oracle_is_not_ols(case, loaded: list[dict]) -> None:
+    assert training_trajectories(case, "oracle") is case.clean_train_q
+    assert training_trajectories(case, "ols") is case.noisy_train_q
+    clean = fit(case.clean_train_q, "oracle").O
+    noisy = fit(case.noisy_train_q, "ols").O
+    assert not np.shares_memory(clean, noisy)
+    assert np.linalg.norm(clean - noisy) > 1.0e-6 * np.linalg.norm(clean)
+    by_name = {row["estimator"]: row for row in loaded}
+    assert by_name["oracle"]["err_O_rel"] < 1.0e-8
+    assert by_name["ols"]["err_O_rel"] > 1.0e-3
+    assert by_name["oracle"]["rollout_mean_finite"] != by_name["ols"]["rollout_mean_finite"]
+
+
+def _assert_every_fit_uses_its_training_values(case) -> None:
+    seen = []
+    real_fit = pipeline.fit
+
+    def wrapped(trajs, method, sigma2=None, lam=None, correct_intercept=True):
+        result = real_fit(trajs, method, sigma2=sigma2, lam=lam, correct_intercept=correct_intercept)
+        seen.append((method, trajs, result, sigma2, lam, correct_intercept))
+        return result
+
+    pipeline.fit = wrapped
+    try:
+        pipeline.evaluate_case(case)
+    finally:
+        pipeline.fit = real_fit
+    assert [item[0] for item in seen] == list(ESTIMATORS)
+    assert len({id(item[2].O) for item in seen}) == len(ESTIMATORS)
+    for method, trajs, result, sigma2, lam, correct in seen:
+        _assert_training_content(case, method, trajs)
+        again = real_fit(
+            training_trajectories(case, method), method,
+            sigma2=sigma2, lam=lam, correct_intercept=correct,
+        )
+        assert not np.shares_memory(result.O, again.O)
+        np.testing.assert_allclose(result.O, again.O, rtol=0.0, atol=1e-8)
+    oracle, ols = seen[0][2].O, seen[1][2].O
+    assert not np.shares_memory(oracle, ols)
+    assert float(np.linalg.norm(oracle - ols)) > 0.0
+
+
+def _assert_training_content(case, method: str, trajs) -> None:
+    expected = training_trajectories(case, method)
+    other = case.noisy_train_q if method == "oracle" else case.clean_train_q
+    assert trajs is expected
+    for left, right in zip(trajs, expected, strict=True):
+        np.testing.assert_array_equal(left, right)
+    assert any(not np.array_equal(left, right) for left, right in zip(trajs, other, strict=True))
 
 
 def _assert_values(loaded: list[dict], case) -> None:

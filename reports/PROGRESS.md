@@ -356,3 +356,58 @@ E8 在 φ=0 时 `theory_gap_rel` 的填报口径仍未决定。
 **下一步：** 可以开始准备 E0。这次没有进入 E0。
 
 **最终状态：** `STAGE3_END_TO_END_INTEGRATION_COMPLETE`
+
+## E0 前置检查 — 2026-11-02 17:03
+
+**远程 git commit：** 没有提交。起点仍是 `62fe1b901cfd602f8896123854a6d92b606e0694`。修复留在工作区。
+
+**Gate A：** `BLOCKED`
+
+smoke 里 Oracle 和 OLS 的预测均值相同，是因为 `pipeline.py` 把 `oracle` 也拟合在带噪训练轨迹上。`estimators.fit` 对这两个名字使用同一个最小二乘求解器，差别只应来自训练数据。修复前七个估计器拿到的是同一个 `noisy_train_q` 对象。
+
+修复前，HANQING-WIN 上同一次 smoke 的只读诊断：
+
+- Oracle 与 OLS 的算子都有限，内存不共享，但 \(\|O_{\mathrm{ols}}-O_{\mathrm{oracle}}\|_F=0\)。
+- 相对干净训练上的 Oracle，\(\|O_{\mathrm{ols}}-O_{\mathrm{clean}}\|_F/\|O_{\mathrm{clean}}\|_F=1.1708528631199147\)。
+- 全阶训练噪声均方是 `7.732426088440512e-05`，目标 `sigma2_true` 是 `7.782203674037263e-05`。降阶投影后的均方是 `8.428184687289594e-05`。
+- 测试轨迹与干净测试轨迹一致。发散阈值 `2882.9612563075525` 来自带噪训练状态。
+- 配对数都是 120，等于 3 条轨迹各自的 40 个相邻配对，没有跨轨迹。
+- 50 条测试轨迹的误差和发散标记完全相同。发散下标：0–4、6–8、11、12、15、17–19、23–25、27、28、31、33–35、37、39、40、42、44–49。未发散下标：5、9、10、13、14、16、20–22、26、29、30、32、36、38、41、43。
+- 两者的 `diverged_frac` 都是 0.66，`rollout_mean_finite` 都是 `1.0235660004976945`。
+
+修复只改了 `pipeline.py` 和 `tests/test_smoke.py`。`oracle` 使用 `clean_train_q`，其余估计器仍共用 `noisy_train_q`。每个估计器的发散阈值来自它自己的训练轨迹。没有改估计器、理论或阈值。
+
+修复后同一配置：
+
+- Oracle 在干净数据上，OLS 在带噪数据上，两个算子不共享内存。
+- \(\|O_{\mathrm{ols}}-O_{\mathrm{oracle}}\|_F/\|O_{\mathrm{oracle}}\|_F=1.1708528631199147\)。
+- Oracle：`err_O_rel=0`，`diverged_frac=0.28`，`rollout_med=1.0110377125145014`，`rollout_mean_finite=2.4780765411692833`。
+- OLS：`err_O_rel=1.1708528631199147`，`diverged_frac=0.66`，`rollout_med=inf`，`rollout_mean_finite=1.0235660004976945`。
+
+**测试状态：** 完整 pytest 76 通过，0 失败，22.58 秒。`git diff --check` 通过。
+
+**Gate B：** 没有执行。没有写 `results/e0`。没有运行 E1–E8。
+
+**问题与建议：**
+
+E8 在 φ=0 时 `theory_gap_rel` 的填报口径仍未决定。本次没有涉及该指标。
+
+**下一步：** 等待负责人复核这条集成修复。通过后再运行正式 E0。
+
+**最终状态：** `E0_PREFLIGHT_BLOCKED`
+
+## Gate A 验收 — 2026-11-02
+
+负责人原则上接受上述集成修复。本节只记录代码复核和回归测试，正式 E0 在本节提交之后另行执行。
+
+**数据流：** `training_trajectories` 把 `oracle` 指到 `clean_train_q`，把 `ols`、`ridge`、`mc`、`mc_psd`、`iv`、`iv2` 指到同一次重复的 `noisy_train_q`。每个估计器各自调用 `fit`，返回新的算子数组。参考算子是另一次干净数据上的 `fit`。测试轨迹保持干净，预测初值取自干净测试轨迹。POD 投影与全阶重构使用同一组基。
+
+**回归测试：** `tests/test_smoke.py` 核对六件事：训练列表就是对应的那一份数据；逐条轨迹的数值与该来源一致，并且和另一来源不同；Oracle 与独立的干净数据拟合一致到 `1e-8`；OLS 与 Oracle 的算子差非零；七个拟合结果在同时存活时不是同一个数组，也不能通过改一份影响另一份；其余六个估计器的训练数值是带噪轨迹。
+
+**发散阈值口径：** 02 第 7 节规定 \(\|\hat q_k\|_\infty > 10^3 \max_{\mathrm{train}}\|q\|_\infty\)，没有说明训练数据来源不同的估计器是否共用一个阈值。当前实现不改。每个估计器用自己的训练轨迹计算这个阈值。`inf` 和 `nan` 的处理也不改。E0 不依赖 rollout 发散比例，所以这个口径不阻塞 E0。进入 E1–E8 之前，需要单独明确跨估计器阈值是否可比。
+
+**测试：** 完整 pytest 76 通过，0 失败，0 跳过，22.82 秒。`git diff --check` 通过。工作区只有 `pipeline.py`、`tests/test_smoke.py`、`reports/PROGRESS.md`。起点 HEAD 是 `62fe1b901cfd602f8896123854a6d92b606e0694`。
+
+**本段提交说明：** `fix: fit oracle on clean training trajectories`
+
+**仍未决定：** E8 在 φ=0 时 `theory_gap_rel` 的填报口径。本次没有改这个指标。
