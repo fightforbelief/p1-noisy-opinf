@@ -1,0 +1,14 @@
+# E2：S1 上七个估计器的比较。网格与 04 的 E2 节一致。
+system: s1
+r: 8
+rho: [0, 0.01, 0.02, 0.05, 0.1, 0.2]
+n_train: [10, 30, 100]
+estimators: [oracle, ols, ridge, mc, mc_psd, iv, iv2]
+sigma2_source: true
+replicates: 100
+experiment_id: 2
+# 03 的噪声键使用主网格下标。验证集把 traj_index 加 100。
+rho_grid: [0, 0.01, 0.02, 0.05, 0.1, 0.2]
+seed_pattern: "1,4,2,rho_index,replicate,traj"
+validation_offset: 100
+threshold_rule: "1e3 * max abs of the clean training prefix; shared across estimators, rho, and replicates"

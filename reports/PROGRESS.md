@@ -507,3 +507,13 @@ S2 `mc_psd` 的误差从 `0.0030837080887182624` 变为 `6.375601524926835e-12`�
 误差棒是偏差范数在对角协方差下的 delta-method 标准误的 ±2 倍，不是 `||SE||_F`。第一次写出的 `summary.csv` 没有给含逗号的 `seed_pattern` 加引号，列因此错位。随后只用已归档算子重写了汇总表，没有重拟合；重算的 `O_theory_gap_rel` 与表内值之差的最大值是 0。`runs.csv`、`operators.npz`、`meta.json` 保持原文件。
 
 完整 pytest 在这版代码上是 94 passed，0 failed，24.92 秒。结果目录被忽略。输出哈希见 `reports/E1_OUTPUT_MANIFEST.md`，分析见 `reports/E1_OLS_BIAS.md`。没有启动 E2–E8。没有修改已验收的理论和估计器。
+
+## E2 估计器比较
+
+状态：`E2_EXPERIMENT_COMPLETE_WITH_SCIENTIFIC_DISCREPANCY`。E1 的数值、图和清单没有重算。进入 E2 前，E0、E0_retry1、E1、E1_pilot 的 SHA-256 与既有清单一致，HEAD 是 `9bc73f190ba92c11d9b969348fd02cc15e6e9639`，工作区干净。`results/e2/` 原先不存在。
+
+**发散阈值。** 旧口径是每个估计器用自己的训练轨迹计算 `1e3 * max ||q||_∞`：oracle 用干净轨迹，其余用带噪轨迹，因此比较时的发散线可以不同。新口径从 E2 起生效：每个 `n_train` 只用该样本量的干净训练前缀，`B=1e3 * max ||q_k||_∞`。同一 `n_train` 下，七个估计器、全部 rho 和全部 replicate 共用这个数。验证集、测试集和预测结果不参与。训练数据不变：oracle 仍拟合干净轨迹，其余六个仍拟合同一份带噪轨迹。历史结果不按新口径重写。三个阈值是 n=10 的 `963.9619697494801`、n=30 的 `1189.4190516808758`、n=100 的 `1570.4767311563792`。`02` 第 7 节只加了这一段说明。`rollout.py` 的预测方程和 smoke 的按估计器阈值都没有改。
+
+正式网格是 S1、r=8、rho 为主网格六档、n_train 为 10/30/100、七个估计器、R=100、`experiment_id=2`，共 12600 行。验证噪声把 `traj_index` 加 100。先导是 rho=0.05、n_train=30、replicate 0 和 1，写入 `results/e2_pilot/`。先导通过。两次重复 6.8555055998731405 秒，按重复外推 6169.955039885826 秒，按配对数加权 9597.707839822397 秒，低于 4 小时，R 未改。正式运行 1400.5735625999514 秒，12600 行，失败拟合 0。运行时 HEAD 仍是 `9bc73f190ba92c11d9b969348fd02cc15e6e9639`，因为代码提交发生在运行之后。pytest 在运行前是 106 passed，0 failed，25.10 秒。
+
+算子误差相对 `O_true`。rho=0 时 oracle、OLS、MC、MC-PSD、IV、IV2 的 `err_O_rel` 中位数都小于 1e-8；Ridge 不要求等于 oracle，n=10 时是 `1.5360367460162803e-08`。n_train=30 和 100 上，MC、IV、IV2 的偏差低于 OLS，并随样本量下降。n_train=10 且 rho≥0.05 时，MC、MC-PSD 和 IV 的误差、方差和发散比例同时变大，MC-PSD 在 rho=0.2 的 `err_O_rel` 中位数是 408。这是样本不足下的不稳定，不是把 E1 的有限样本差当成公式错误后去改估计器。详细数字见 `reports/E2_ESTIMATOR_COMPARISON.md`。没有启动 E3–E8。`theory.py` 与 `estimators.py` 的 SHA-256 未变。
