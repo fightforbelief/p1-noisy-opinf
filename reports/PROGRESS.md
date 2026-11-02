@@ -516,4 +516,14 @@ S2 `mc_psd` 的误差从 `0.0030837080887182624` 变为 `6.375601524926835e-12`�
 
 正式网格是 S1、r=8、rho 为主网格六档、n_train 为 10/30/100、七个估计器、R=100、`experiment_id=2`，共 12600 行。验证噪声把 `traj_index` 加 100。先导是 rho=0.05、n_train=30、replicate 0 和 1，写入 `results/e2_pilot/`。先导通过。两次重复 6.8555055998731405 秒，按重复外推 6169.955039885826 秒，按配对数加权 9597.707839822397 秒，低于 4 小时，R 未改。正式运行 1400.5735625999514 秒，12600 行，失败拟合 0。运行时 HEAD 仍是 `9bc73f190ba92c11d9b969348fd02cc15e6e9639`，因为代码提交发生在运行之后。pytest 在运行前是 106 passed，0 failed，25.10 秒。
 
-算子误差相对 `O_true`。rho=0 时 oracle、OLS、MC、MC-PSD、IV、IV2 的 `err_O_rel` 中位数都小于 1e-8；Ridge 不要求等于 oracle，n=10 时是 `1.5360367460162803e-08`。n_train=30 和 100 上，MC、IV、IV2 的偏差低于 OLS，并随样本量下降。n_train=10 且 rho≥0.05 时，MC、MC-PSD 和 IV 的误差、方差和发散比例同时变大，MC-PSD 在 rho=0.2 的 `err_O_rel` 中位数是 408。这是样本不足下的不稳定，不是把 E1 的有限样本差当成公式错误后去改估计器。详细数字见 `reports/E2_ESTIMATOR_COMPARISON.md`。没有启动 E3–E8。`theory.py` 与 `estimators.py` 的 SHA-256 未变。
+算子误差相对 `O_true`。rho=0 时 oracle、OLS、MC、MC-PSD、IV、IV2 的 `err_O_rel` 中位数都小于 1e-8；Ridge 不要求等于 oracle，n=10 时是 `1.5360367460162803e-08`。n_train=30 和 100 上，MC、IV、IV2 的偏差低于 OLS，并随样本量下降。n_train=10 且 rho≥0.05 时，MC、MC-PSD 和 IV 的误差、方差和发散比例同时变大，MC-PSD 在 rho=0.2 的 `err_O_rel` 中位数是 408。这是样本不足下的不稳定，不是把 E1 的有限样本差当成公式错误后去改估计器。详细数字见 `reports/E2_ESTIMATOR_COMPARISON.md`。E2 随后按 `E2_AUDIT_PASS_WITH_LIMITATIONS` 冻结，没有重跑。`theory.py` 与 `estimators.py` 的 SHA-256 未变。
+
+## E3 Burgers POD 估计器比较
+
+状态：`E3_EXPERIMENT_COMPLETE_WITH_SCIENTIFIC_DISCREPANCY`。E0–E2 的数据和已验收数学实现没有改。
+
+正式运行前的提交是 `ed0006a4d3d37e81091c86d443423cc2be266903`。先导 `results/e3_pilot/` 为 60 行，外推 135.7364175999537 秒，低于 4 小时，网格未缩减。正式目录 `results/e3/` 有 3600 行，失败 0，墙钟 302.1770353000611 秒。运行时 HEAD 就是上述提交，开始和结束的源码 SHA-256 一致。pytest 为 115 passed、0 failed。独立复算 `AUDIT_PASS`。
+
+参考是各 POD 基上的 `O_clean`。noisy basis 的参考随重复改变，所以该基不报告跨重复偏差。rho≥0.02 时 MC、IV、IV2 相对 OLS 的算子误差配对区间整段为负；rho=0.01 时只有 MC 如此。clean basis、rho=0.2 的 `sd_O_rel` 最大约 0.023，没有复现 E2 在 n_train=10 上的方差爆炸。MC-PSD 的 `n_clipped` 全是 0。trailing median 的 σ² 相对误差小于 Gavish–Donoho，但这个差别几乎不改变算子误差。Oracle 的全视界中位数约为 0.134，与池化投影误差同一量级。H3 的谱半径纠正只表现为约 0.0017 的偏移，MC/IV 还落到参考的另一侧。H4 在高噪声下 MC/IV 的能量违反小于 OLS，但 `O_clean` 本身的违反已经约为 0.044。
+
+图是 `figures/fig_e3_operator_err.png`、`fig_e3_rollout.png`、`fig_e3_basis_effect.png`、`fig_e3_sigma_source.png`。分析见 `reports/E3_BURGERS_POD_COMPARISON.md`，哈希见 `reports/E3_OUTPUT_MANIFEST.md`。没有启动 E4–E8。
