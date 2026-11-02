@@ -186,9 +186,12 @@ def _fit_ridge(trajs: Sequence[np.ndarray], lam: float | None):
 
 
 def _fit_mc(trajs: Sequence[np.ndarray], variance: float, psd: bool):
+    """sigma² 严格为 0 时，mc_psd 与 mc 求解同一组未截断矩。"""
     inputs, outputs = _pair_states(trajs)
     gram, cross = _mc_moments(inputs, outputs, variance)
-    if psd:
+    if psd and variance == 0.0:
+        operator, diagnostics = _solve_moments(gram, cross)
+    elif psd:
         operator, diagnostics = _solve_psd(gram, cross)
     else:
         operator, diagnostics = _solve_moments(gram, cross)

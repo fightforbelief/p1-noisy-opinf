@@ -161,3 +161,103 @@ def test_pairs_do_not_cross_trajectories():
     manual[-1] *= kappa
     assert relative_error(result.O, manual) < 1e-10
     assert first.shape[0] + second.shape[0] - 1 != result.n_pairs
+
+
+def test_mc_psd_zero_matches_unclipped_mc():
+    mc = fit(SHORT, "mc", sigma2=0.0)
+    psd = fit(SHORT, "mc_psd", sigma2=0.0)
+    np.testing.assert_allclose(psd.O, mc.O, rtol=0.0, atol=0.0)
+    assert psd.diagnostics["n_clipped"] == 0
+    assert set(psd.diagnostics) == set(mc.diagnostics)
+    assert psd.diagnostics["gram_min_eig"] == mc.diagnostics["gram_min_eig"]
+    assert psd.diagnostics["gram_cond"] == mc.diagnostics["gram_cond"]
+    enlarged = [traj * 7.0 for traj in SHORT]
+    scaled = fit(enlarged, "mc_psd", sigma2=0.0).O
+    rank = psd.O.shape[1]
+    quad = rank * (rank + 1) // 2
+    expected = psd.O.copy()
+    expected[rank:rank + quad] /= 7.0
+    expected[-1] *= 7.0
+    np.testing.assert_allclose(scaled, expected, rtol=1e-10, atol=1e-12)
+
+
+def test_s2_clean_gram_mc_psd_stays_unclipped():
+    from noisyopinf.metrics import err_O_rel
+    from noisyopinf.pod import pod_basis, project
+    from noisyopinf.systems import burgers
+    fields = [burgers.simulate(index, 1) for index in range(10)]
+    basis, _ = pod_basis(fields, 8)
+    trajectories = [project(field, basis) for field in fields]
+    _, _, below, variance = _scaled_moments(trajectories, 0.0)
+    psd = fit(trajectories, "mc_psd", sigma2=0.0)
+    oracle = fit(trajectories, "oracle").O
+    assert variance == 0.0 and below == 1
+    assert psd.diagnostics["gram_cond"] > 1.0e8
+    assert psd.diagnostics["n_clipped"] == 0
+    assert err_O_rel(psd.O, oracle) < 1.0e-8
+
+
+def test_positive_sigma_keeps_psd_clip():
+    trajs = [_near_dependent_traj()]
+    result = fit(trajs, "mc_psd", sigma2=1.0e-6)
+    expected, diagnostics, below, variance = _scaled_moments(trajs, 1.0e-6)
+    assert variance > 0.0 and below > 0
+    assert result.diagnostics["n_clipped"] == below == diagnostics["n_clipped"]
+    np.testing.assert_allclose(result.O, expected, rtol=0.0, atol=0.0)
+    gap = float(np.max(np.abs(result.O - fit(trajs, "mc", sigma2=1.0e-6).O)))
+    assert gap > 0.0
+
+
+def test_small_positive_sigma_is_not_zero():
+    trajs = [_near_dependent_traj()]
+    small = fit(trajs, "mc_psd", sigma2=1.0e-12)
+    zero = fit(trajs, "mc_psd", sigma2=0.0)
+    assert small.diagnostics["n_clipped"] > 0
+    assert zero.diagnostics["n_clipped"] == 0
+    assert not np.allclose(small.O, zero.O)
+
+
+def test_positive_sigma_without_clip_matches_psd_solver():
+    noisy = _noisy(SHORT, 0.05, (11, 161))
+    result = fit(noisy, "mc_psd", sigma2=0.05**2)
+    expected, _, below, variance = _scaled_moments(noisy, 0.05**2)
+    assert variance > 0.0 and below == 0
+    assert result.diagnostics["n_clipped"] == 0
+    np.testing.assert_allclose(result.O, expected, rtol=0.0, atol=0.0)
+
+
+def test_mc_psd_zero_singular_stays_nan():
+    result = fit([np.zeros((4, 2))], "mc_psd", sigma2=0.0)
+    assert np.isnan(result.O).all()
+    assert result.diagnostics["n_clipped"] == 0
+    assert result.diagnostics["error"]
+
+
+def _near_dependent_traj() -> np.ndarray:
+    gen = rng(11, 150)
+    time = np.linspace(0.0, 1.0, 40)
+    signal = np.sin(2.0 * np.pi * time)
+    return np.column_stack([
+        signal,
+        0.2 * np.cos(2.0 * np.pi * time),
+        1.0e-8 * signal,
+        1.0e-10 * gen.normal(size=time.shape),
+    ])
+
+
+def _scaled_moments(trajs, sigma2: float):
+    from noisyopinf.estimators import (
+        _mc_moments, _pair_states, _peak_abs, _solve_psd, _to_original, _validated_trajs,
+    )
+    states, rank = _validated_trajs(trajs)
+    kappa = _peak_abs(states)
+    scaled = [traj / kappa for traj in states]
+    variance = float(sigma2) / kappa**2
+    inputs, outputs = _pair_states(scaled)
+    gram, cross = _mc_moments(inputs, outputs, variance)
+    operator, diagnostics = _solve_psd(gram, cross)
+    if np.isfinite(operator).all():
+        operator = _to_original(operator, rank, kappa)
+    eigenvalues = np.linalg.eigvalsh(0.5 * (gram + gram.T))
+    below = int(np.sum(eigenvalues < 1.0e-8 * float(eigenvalues[-1])))
+    return operator, diagnostics, below, variance
