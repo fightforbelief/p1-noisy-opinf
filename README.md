@@ -17,7 +17,7 @@ py -3.12 -m venv .venv
 $py = '.\.venv\Scripts\python.exe'
 & $py -m pip install -r requirements.txt
 $env:PYTHONPATH = 'src'
-& $py -m pytest -q tests publication/test_study.py
+& $py -m pytest -q tests publication
 & $py publication/audit.py
 ~~~
 
