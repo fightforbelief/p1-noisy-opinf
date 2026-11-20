@@ -1,0 +1,16 @@
+# E5 第 1 部分：干净 Burgers POD 上的 IV 估计目标。只跑无噪声部分。
+experiment: E5_PART1
+system: s2
+n_train: 100
+n_val: 0
+n_test: 50
+basis: clean
+rho: 0
+r: [4, 6, 8, 10, 12, 16, 20]
+r_max: 20
+sigma2: 0
+correct_intercept: false
+estimators: [ols, iv, iv2]
+relative_reference_floor: 1.0e-12
+threshold_rule: "1e3 * max abs of the clean projected training states on that rank"
+output_dir: results/e5_part1
