@@ -7,3 +7,7 @@ results/
 *.npz
 .DS_Store
 ._*
+/manuscript/*.log
+/manuscript/*.aux
+/manuscript/*.out
+/manuscript/*.xdv

@@ -1,0 +1,157 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,booktabs,graphicx,url}
+\usepackage[hidelinks]{hyperref}
+\newcommand{\RR}{\mathbb R}
+\newcommand{\col}{\mathop{\rm col}}
+\newcommand{\F}{\mathrm F}
+\makeatletter\let\tableinput\@@input\makeatother
+\input{numbers}
+\title{How closely do lagged instruments reproduce least squares in operator inference?}
+\author{Yunjie Guo \and Hanqing Yang\thanks{Corresponding author. Email:
+\href{mailto:hanqing.yang189@gmail.com}{hanqing.yang189@gmail.com}.}}
+\date{Independent researchers, Suzhou, China}
+\begin{document}
+\maketitle
+\begin{abstract}
+Lagged features can serve as instruments when fitting a reduced evolution operator from trajectory snapshots. On smooth trajectories, adding lagged instruments can bring the fitted operator unexpectedly close to ordinary least squares. We characterize this effect on a common set of observation times. For a fixed design, the largest principal angle between the current and lagged feature spaces gives the sharp amplification factor from the least-squares residual to the displacement of fitted values. For equally spaced lags on smooth trajectories, we derive the leading coefficient of this factor and of the realized displacement as the lag spacing tends to zero. The formula accounts for constant features and identifies cancellations specific to the response. A manufactured example resolves the leading term for one, two and three lags. Independent trajectory ensembles for viscous Burgers and Allen--Cahn dynamics give smaller realized displacements with two lags in all \PairCount{} matched comparisons. Held-out errors show that agreement between fits is distinct from predictive accuracy. Adding one percent observation noise brings the median two-lag displacement to about 97 percent of the one-lag displacement in both equations.
+\end{abstract}
+\noindent\textbf{Keywords}\quad Operator inference, instrumental variables, principal angles, model reduction, least squares
+
+\section{A discrepancy in a clean-data control}
+In discrete-time operator inference, regression maps the present reduced state to the next one using a prescribed feature dictionary \cite{opinf}. With a quadratic dictionary the map is linear in its unknown coefficients. Projecting away spatial degrees of freedom can leave a nonzero regression residual even if every snapshot is exact. Learning models with memory is one response to this loss of information \cite{memory}. We keep the prediction map fixed and ask what happens when earlier values of the dictionary serve as instruments for its current value. Past-snapshot projections also appear in subspace dynamic mode decomposition and noise-resistant approximation of stochastic Koopman operators \cite{takeishi,wanner}. Their statistical goals motivate a finite-sample control. How much can an instrumented fit move even on clean trajectories?
+
+A pilot fit to 100 decaying Burgers trajectories illustrates two different effects. With 20 proper orthogonal decomposition (POD) modes, the two-lag coefficient matrix differed from the full-window ordinary least-squares (OLS) fit by \FullTwo\% in relative Frobenius norm. Refitting OLS on the same current times as the two-lag estimator reduced this difference to \MatchTwo\%. With one lag, the matched difference was \MatchOne\%. Two algebraically equivalent one-lag solvers differed by only $\SolverGap$ in relative coefficient norm. These numbers motivated the study and are reported separately from the independently generated trajectory blocks below.
+
+The missing rows matter in a transient. Write $F$ for all current times, $S$ for those retained after forming lags and $D=F\setminus S$. Let $B_F,B_S$ be the respective OLS fits and $E_D=Y_D-Z_DB_F$. Subtracting the two normal equations gives the grouped deletion identity \cite{cook}
+\begin{equation}
+ B_S-B_F=-(Z_S^TZ_S)^{-1}Z_D^TE_D. \label{eq:delete}
+\end{equation}
+The instrumented difference from $B_F$ therefore contains both $B_{\rm IV}-B_S$ and $B_S-B_F$. Their norms need not add. Deleting two starting frames removes two observations \emph{per trajectory}, both at the same physical stage. All subsequent comparisons fix $S$ before changing instruments.
+
+\section{A sharp bound on the common window}
+Let $Z\in\RR^{n\times p}$ contain current features, $Y\in\RR^{n\times r}$ the next states, and $W$ the instruments, stacked separately within each trajectory. Let $P$ be the orthogonal projector onto $\col(W)$ and factor $Z=UR$ with $U^TU=I$ and $R$ invertible. Assume $C=U^TPU$ is positive definite. On these rows, $B_0=\arg\min_B\|Y-ZB\|_{\F}$ and $B_W=\arg\min_B\|P(Y-ZB)\|_{\F}$ are unique. The latter is the two-stage least-squares fit. Put $E=Y-ZB_0$, $D_W=Z(B_W-B_0)$ and $s_W=\|D_W\|_{\F}/\|E\|_{\F}$ when $E\ne0$.
+
+\paragraph{Proposition 1.} Let $\theta$ be the largest principal angle from $\col(Z)$ to $\col(W)$. Then
+\begin{align}
+ D_W &= -U C^{-1} [(I-P)U]^T E, \label{eq:shift}\\
+ \sup_{E\ne0,\, U^T E=0} \frac{\|D_W\|_{\F}}{\|E\|_{\F}}
+ &=\sqrt{\lambda_{\min}(C)^{-1}-1}=\tan\theta. \label{eq:bound}
+\end{align}
+For a perfect fit $E=0$, both estimates coincide. Enlarging the instrument space on the same rows weakly decreases this sharp bound. The supremum assumes $n>p$.
+
+\paragraph{Proof.} The projected normal equations give $R(B_W-B_0)=C^{-1}U^TPE$. Since $U^TE=0$, this implies \eqref{eq:shift}. On arbitrary residuals the relevant map in $U$ coordinates is $A=C^{-1}U^TP(I-UU^T)$. Using $P^2=P$ gives $AA^T=C^{-1}-I$. Its largest singular value is attained on a unit residual orthogonal to $U$ whenever the bound is positive. The smallest eigenvalue of $C$ is the square of the smallest singular value of $Q^TU$, for an orthonormal basis $Q$ of $\col(W)$. This singular value is $\cos\theta$, as in classical principal-angle geometry \cite{angles}. For nested spaces the projector difference is positive semidefinite, so the minimum eigenvalue cannot decrease. \hfill\rule{1ex}{1ex}
+
+This ordering applies to a worst case over responses. For example, take $Z=e_1$, $Y=e_3$ in $\RR^3$, and instrument spaces spanned first by $e_1+e_2$, then by $e_1+e_2$ and $e_1+e_3$. The absolute fitted displacement increases from zero to $1/2$, while the bound decreases from $1$ to $1/\sqrt{2}$. The example explains why counting how often actual displacements shrink is an empirical question.
+
+
+\section{Small-spacing expansion for smooth dictionaries}
+Let $Z=[A,F(0)]$ on fixed anchor rows. The columns of $A$ are unchanged by lagging, for example an intercept. Each row of $F(s)$ evaluates the dynamic dictionary on its trajectory at anchor time plus $s$. Take $m$ equally spaced lag blocks and let $P_h$ project onto
+\[
+ \mathcal W_h=\col[A,F(-h),F(-2h),\ldots,F(-mh)].
+\]
+The prediction horizon and the response $Y$ are held fixed. Define the derivative space
+$\mathcal J=\col[A,F(0),F'(0),\ldots,F^{(m-1)}(0)]$, its orthogonal projector $P_{\mathcal J}$, and
+\[
+ L=(I-P_{\mathcal J})[0,F^{(m)}(0)]R^{-1}.
+\]
+
+\paragraph{Theorem 2.} Suppose that $F$ is $m$ times continuously differentiable near the anchors and the displayed matrix defining $\mathcal J$ has full column rank. As $h\downarrow0$,
+\begin{equation}
+ \tan\theta_h=h^m\|L\|_2+o(h^m),\qquad
+ D_{W_h}=-h^m U L^TE+o(h^m). \label{eq:limit}
+\end{equation}
+In particular, $L\ne0$ gives exact order $m$ for the worst-case factor. A response with $L^TE=0$ has smaller leading displacement. These statements hold for the fixed sample and coordinate basis, with no distributional assumption on $Y$.
+
+\paragraph{Proof.} Replace the lag blocks by the backward divided differences of orders $0$ through $m-1$ at the same nodes, scaling each by a nonzero constant so its limit is $F^{(j)}(0)$. This invertible block transformation preserves their span for $h>0$. Full rank of the limit implies convergence of the orthogonal projectors to $P_{\mathcal J}$ and hence $C_h=U^TP_hU\to I$. In particular, the projected design has full rank for sufficiently small $h$.
+
+Extrapolating the current features from these $m$ nodes yields
+\[
+ H_h=\sum_{j=1}^m(-1)^{j+1}\binom{m}{j}F(-jh),
+ \qquad F(0)-H_h=h^m F^{(m)}(0)+o(h^m).
+\]
+This follows entrywise from the backward difference, whose weights cancel all powers below $m$. Since $[A,H_h]$ lies columnwise in $\mathcal W_h$,
+\[
+ h^{-m}(I-P_h)U
+  =(I-P_h)\,[0,h^{-m}(F(0)-H_h)]R^{-1}\ \longrightarrow\ L .
+\]
+Taking the spectral norm gives the limit of $\sin\theta_h/h^m$. Since $\cos\theta_h\to1$, the first expansion follows. Substituting the matrix limit into \eqref{eq:shift} gives the second. \hfill\rule{1ex}{1ex}
+
+The coefficient depends on the part of the next time derivative that earlier derivatives cannot span, measured after normalizing the current design. There are two ways a displacement can be small. The lagged feature space may almost contain the present one, or the residual may be nearly orthogonal to the remaining direction. The derivative-rank condition is sufficient. With redundant derivative columns, extrapolation still gives an $O(h^m)$ upper bound on $\sin\theta_h$ for fixed full-rank $Z$, but the displayed limiting projector requires separate justification. As the POD rank or number of rows changes, $R^{-1}$ and the derivative space change too. The result gives no uniformity over these choices.
+
+\paragraph{Computation.} Use thin QR for $Z$ and an orthonormal basis $Q$ from a rank-revealing decomposition of $W$. Set $M=Q^TU$. Compute the update by solving $\min_X\|MX-Q^TE\|_{\F}$ and then $R(B_W-B_0)=X$. Compute the bound as $\|U-QM\|_2/\sigma_{\min}(M)$. This avoids subtracting two nearly equal fitted operators and forming a cross-product normal matrix. Exact duplicate intercepts can be represented once. Nearly identical lag columns can lose numerical rank as $h$ decreases. Divided differences offer an equivalent basis in exact arithmetic, but noisy temporal differences can amplify observational error. The raw-feature experiments record numerical rank on every fit.
+
+\paragraph{Manufactured check.} Use the fixed anchors $t_i=-1+i/40$, $i=0,\ldots,80$, a constant and $F(s)_i=(t_i+s)^4$. The derivatives and time shifts are exact polynomials. We evaluated the divided differences from polynomial coefficients and computed $\|L\|_2$ independently from the derivative matrix. Table~\ref{tab:quartic} tests the leading constant. At three lags the two coarsest spacings visibly depart from the limit.
+\begin{table}[ht]\centering
+\caption{Quartic dictionary. Columns headed by $h$ give $\tan\theta_h/(h^m\|L\|_2)$.}\label{tab:quartic}
+\begin{tabular}{rrrrrr}\toprule
+$m$ & $\|L\|_2$ & $.050$ & $.020$ & $.010$ & $.005$\\ \midrule
+\tableinput quartic.tex
+\bottomrule\end{tabular}
+\end{table}
+
+\section{Independent trajectory experiments}
+We generated two families of periodic trajectories on $[0,1)$ for $0\le t\le1$. The viscous Burgers equation $u_t=-u u_x+0.01u_{xx}$ uses 256 spatial points, a Fourier discretization with a two-thirds filter on the nonlinear flux, and exponential time differencing of order four \cite{etd} with step $0.00025$. The Allen--Cahn equation $u_t=0.002u_{xx}+3u(1-u^2)$ uses 128 spatial points and symmetric splitting with step $0.00125$. Its subflows use exact Fourier diffusion and pointwise reaction. A separate refinement test halves the time step and doubles the spatial resolution on three initial conditions, requiring a maximum snapshot-relative error below $10^{-4}$. Both equations start from $0.5\sum_{j=1}^3(g_j/j)\sin(2\pi jx+\phi_j)$ with independent standard-normal $g_j$ and uniform phases.
+
+For each equation we used eight disjoint blocks, each with 40 training and 12 held-out trajectories. Within a block, the training snapshots at times $0,0.005,\ldots,1$ define one uncentered POD basis. Each fit uses its first $r=6,10,16$ modes and a dictionary containing the reduced state, all distinct quadratic monomials, and an intercept. The response is always one sample ahead. Current indices $10,\ldots,199$ give 7,600 training rows at every lag spacing $h=0.005,0.010,0.025$. Past features at $k-h/\Delta t$ define the first space. The second adds features at $k-2h/\Delta t$. The second lag never crosses a trajectory boundary. Held-out trajectories are projected into the training basis. Error norms pool rows and state coordinates within each block.
+
+We fixed this design and primary comparison before examining the new blocks. It was an internal protocol following the pilot. Repeated ranks and spacings within each block share data. The independent experimental units are the eight trajectory ensembles per equation. We report paired ratios, their full range at the shortest spacing, and held-out accuracy. Observations at consecutive times are dependent. No row-level independence assumption enters the calculations.
+
+\paragraph{Use of computational assistance.} OpenAI Codex assisted with the derivations, implementation, execution of the experiments, literature search and drafting. The repository includes the numerical checks, analysis code and block-level summaries used in the manuscript.
+
+
+\section{Results}
+Across both equations, the two-lag fit moved less than the one-lag fit in \SmallerCount{} of \PairCount{} paired evaluations. All projected designs were identifiable at the numerical rank threshold, and all instrument matrices had full column rank. Table~\ref{tab:primary} shows substantial variation in the magnitude of the ratio across ranks and initial-condition ensembles. The displacement uses a prediction norm on the common training rows, so changing units of an individual dictionary column leaves it invariant.
+\begin{table}[ht]\centering\small
+\caption{Clean trajectories at $h=0.005$. The $s_m$ columns give separate block medians. The last three columns summarize the within-block ratio $s_2/s_1$.}\label{tab:primary}
+\begin{tabular}{lrrrrrr}\toprule
+Equation & $r$ & $s_1$ & $s_2$ & Median ratio & Min. ratio & Max. ratio\\\midrule
+\tableinput paired.tex
+\bottomrule\end{tabular}
+\end{table}
+
+Figure~\ref{fig:spacing} fixes $r=10$ and varies the physical distance to the instruments while preserving the prediction horizon. Over this grid the one-lag bound follows an approximately linear trend and the two-lag bound rises approximately quadratically. The dotted slopes use the bound at the shortest spacing as their only normalization. The derivative-rank assumption in Theorem~2 holds analytically for the manufactured dictionary. The PDE curves themselves provide a finite-spacing comparison.
+\begin{figure}[ht]\centering
+\includegraphics[width=.92\linewidth]{spacing.pdf}
+\caption{Sharp displacement factors for the two PDE ensembles at rank 10. Points give block medians, bands span the eight blocks and dotted lines have slopes one and two. All curves use the same anchor times.}\label{fig:spacing}
+\end{figure}
+
+\paragraph{Held-out one-step behavior.} For held-out design $Z_*$ and response $Y_*$, the discrepancy between the fitted maps is $g_*=\|Z_*(B_W-B_0)\|_{\F}/\|Y_*\|_{\F}$. A separate quantity $e_*=\|Y_*-Z_*B\|_{\F}/\|Y_*\|_{\F}$ measures predictive error. Table~\ref{tab:test} distinguishes them. A small two-lag displacement preserves most of the OLS error, including any common model misspecification. An improvement count can be positive even if the change is negligible at the precision relevant for prediction.
+\begin{table}[ht]\centering\small
+\caption{Held-out trajectories at $r=10$, $h=0.005$. Errors and gaps are block medians. Change is the median paired percentage change in error relative to OLS. The count gives blocks with smaller instrumented error.}\label{tab:test}
+\begin{tabular}{lrrrrrr}\toprule
+Equation & Lags & $g_*$ & OLS $e_*$ & IV $e_*$ & Change (\%) & Count\\\midrule
+\tableinput forecast.tex
+\bottomrule\end{tabular}
+\end{table}
+
+\paragraph{Sensitivity to observation noise.} In a subsequent exploratory check we perturbed all reduced training coordinates by independent Gaussian observations with standard deviation $\rho$ times their pooled clean root-mean-square value. We froze the training basis, used one fixed Gaussian array per block scaled across levels, and fit the same raw quadratic dictionary to noisy inputs and noisy responses. The comparator is OLS on the same noisy rows. At one percent noise, both median paired ratios approach one. The ratio falls again at five percent, so the data give no monotone noise law. Temporal noise disrupts the smooth extrapolation used by Theorem~2. Table~\ref{tab:noise} measures the effect on fit agreement. It cannot identify a noise-corrected physical operator.
+\begin{table}[ht]\centering\small
+\caption{Noise sensitivity at $r=10$, $h=0.005$. Each group reports median displacements and the median paired ratio.}\label{tab:noise}
+\begin{tabular}{rrrrrrr}\toprule
+&\multicolumn{3}{c}{Burgers}&\multicolumn{3}{c}{Allen--Cahn}\\
+$\rho$ & $s_1$ & $s_2$ & Ratio & $s_1$ & $s_2$ & Ratio\\\midrule
+\tableinput noise.tex
+\bottomrule\end{tabular}
+\end{table}
+
+\section{Interpretation and limits}
+A lagged-fit comparison can be made in three steps. First record which current times each method uses and refit the baseline on those times. Next compute the residual-normalized fitted displacement and its angular bound. Finally evaluate both methods on separate trajectories in prediction units. A large coefficient change can accompany a small fitted displacement if the design is poorly conditioned. The factor $R^{-1}$ in the coefficient update makes this sensitivity explicit. Conversely, a nearly unchanged fit can still give poor forecasts if the common dictionary omits important dynamics.
+
+Our expansion concerns the target of a finite-sample projection as the instruments move toward fixed anchor times. Instrument exogeneity, consistency, deattenuation and long-horizon stability require other evidence. The simulations cover two smooth, unforced, one-dimensional equations, short lag spacings and clean training bases. They cannot establish a universal preferred lag count or show that the two-lag fit improves noisy-data forecasts. In applications with irregular sampling, rough forcing, measurement noise or near-rank loss, the observed principal angles and held-out errors remain measurable even when the smooth expansion is uninformative.
+
+\section*{Statements and declarations}
+\textbf{Funding.} This research received no specific funding.\\
+\textbf{Competing interests.} The authors declare no competing interests.\\
+\textbf{Data and code availability.} Trajectories are generated from the stated equations and deterministic seed streams. The experiment runners, tests, measured block summaries and manuscript sources are available at \url{https://github.com/fightforbelief/p1-noisy-opinf}.
+
+\begin{thebibliography}{9}
+\bibitem{opinf} Peherstorfer, B., Willcox, K.: Data-driven operator inference for nonintrusive projection-based model reduction. Comput. Methods Appl. Mech. Eng. \textbf{306}, 196--215 (2016). \url{https://doi.org/10.1016/j.cma.2016.03.025}
+\bibitem{memory} Uy, W.I.T., Peherstorfer, B.: Operator inference of non-Markovian terms for learning reduced models from partially observed state trajectories. J. Sci. Comput. \textbf{88} (2021). \url{https://doi.org/10.1007/s10915-021-01580-2}
+\bibitem{takeishi} Takeishi, N., Kawahara, Y., Yairi, T.: Subspace dynamic mode decomposition for stochastic Koopman analysis. Phys. Rev. E \textbf{96}, 033310 (2017). \url{https://doi.org/10.1103/PhysRevE.96.033310}
+\bibitem{wanner} Wanner, M., Mezi\'c, I.: Robust approximation of the stochastic Koopman operator. SIAM J. Appl. Dyn. Syst. (2022). \url{https://doi.org/10.1137/21M1414425}
+\bibitem{cook} Cook, R.D., Weisberg, S.: Residuals and Influence in Regression. Chapman and Hall, New York (1982).
+\bibitem{angles} Zhu, P., Knyazev, A.V.: Angles between subspaces and their tangents. J. Numer. Math. \textbf{21}, 325--340 (2013). \url{https://doi.org/10.1515/jnum-2013-0013}
+\bibitem{etd} Kassam, A.-K., Trefethen, L.N.: Fourth-order time-stepping for stiff PDEs. SIAM J. Sci. Comput. \textbf{26}, 1214--1233 (2005). \url{https://doi.org/10.1137/S1064827502410633}
+\end{thebibliography}
+\end{document}

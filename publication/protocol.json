@@ -1,0 +1,11 @@
+{
+  "design": "Matched-window lag geometry, frozen before new trajectories were examined",
+  "systems": ["burgers", "allen_cahn"],
+  "blocks": 8, "train": 40, "test": 12, "first_index": 1000,
+  "ranks": [6, 10, 16], "spacings": [1, 2, 5], "lags": [1, 2],
+  "start": 10, "steps": 200, "dt_obs": 0.005,
+  "allen_cahn": {"n": 128, "nu": 0.002, "reaction": 3, "substeps": 4},
+  "primary": "In each independent block, compare two vs one lag using the actual training prediction displacement divided by the OLS residual norm. Summarize paired ratios and sign counts. The theorem orders the bound only.",
+  "secondary": "Largest angle, normalized coefficient and held-out one-step displacements; lag-spacing sensitivity on identical rows. Report failed ranks and all grids. No model or rank selection.",
+  "discovery": "E5 historical Burgers clean fit used to motivate design. Follow-up uses disjoint trajectory seeds. This is an internal timestamped protocol, not a public preregistration."
+}

@@ -553,3 +553,51 @@ SNR 的 lower central median 写在运行前的提交 `8f90c7e` 里。这次 10 
 22/120 个汇总格的滚动中位数低于池化投影参考，全部在 rho≤0.05。用已保存的基前缀和干净测试轨迹重算后，逐条轨迹低于自身投影误差的次数是 0。rho=0.01 和 rho=0.02 的四个 κ 都是 `RIGHT_CENSORED_AT_RANK_16`。四个 κ 的 replicate 级平均绝对差和 ±2 命中是 5.98（24/200）、5.00（24/200）、3.74（31/200）、2.26（106/200）。Ridge 在 rho=0.2 的 noisy validation 误差曲线选 r=16，重复秩的 lower central median 是 12。IV2 高秩发散保持 `MECHANISM_NOT_IDENTIFIED`。5% close 阈值是探索性的。
 
 派生表是 `projection_floor_audit.csv`、`snr_reconciliation.csv`、`snr_replicate_detail.csv`、`rank_stability_final.csv`、`rank_gap_final.csv`。脚本是 `scripts/e4_final_reconciliation.py`。全文仍是 `reports/E4_POSTRUN_AUDIT_AND_SCIENTIFIC_INTERPRETATION.md`。pytest 123 passed、0 failed。
+
+## E5 第 1 部分 — 2026-11-03 03:07
+
+**远程 git commit：** 未提交。HEAD 仍是 `4ab0dc996976a782a3b65519f4782e7835a23605`。E4 冻结状态不变：`E4_AUDIT_PASS_WITH_SCIENTIFIC_DISCREPANCY`，H6 为 `H6_PARTIALLY_SUPPORTED`。
+
+**做了什么：** 写了 `reports/E5_PRERUN.md`。用现有 S2 生成器补了训练 index 30–99，没有覆盖 0–29 和测试缓存。smoke 只跑 r=6，正式目录 `results/e5_part1` 跑了七个秩。保存了算子、一步闭包、块偏离、谱、条件数和残差交叉矩。OLS 设计谱曾误用状态矩阵，随后只重写诊断，没有重拟合。
+
+**测试状态：** 132 passed、0 failed，28.21 秒。
+
+**实验运行：** 7 个秩，无重复，墙钟 23.18392219999805 秒，拟合失败 0。r=16 的发散比例是 0.12，r=20 是 0.22 或 0.24，全视界中位数仍有限。
+
+**关键数字（由 `results/e5_part1/metrics.csv` 读出）：**
+
+| r | closure_rel | IV 整体相对偏离 | IV2 整体相对偏离 | OLS rollout_med |
+|---:|---:|---:|---:|---:|
+| 4 | 0.003451566329500799 | 9.461494180260041e-05 | 0.0001141527021683602 | 0.3495866362401631 |
+| 6 | 0.002675399425904661 | 0.0001597006145047618 | 0.0002528052835406496 | 0.1733465119069424 |
+| 8 | 0.001769748113039894 | 0.000292878378852141 | 0.0004931541614246584 | 0.09645583642624206 |
+| 10 | 0.001451541760921785 | 0.001107398979967486 | 0.001090337448184676 | 0.06536492637818356 |
+| 12 | 0.001033373463938065 | 0.002073840397192415 | 0.002273151993310901 | 0.04656788437812345 |
+| 16 | 0.0004640070172048043 | 0.01810385405988245 | 0.01137221385051803 | 0.03199456201646796 |
+| 20 | 0.0002358976563239384 | 0.05940423972573246 | 0.06352973479370896 | 0.01764010127619668 |
+
+**与规格的偏离：** 无公式改动。验证集按第 1 部分不使用，`n_val=0`。共同窗口 OLS 只作诊断。相对偏离在参考范数低于 `1e-12` 时记 NaN；这次没有触发。
+
+**问题与建议：** 这 100 条轨迹上，整体偏离随 r 增大，不是减小。IV2 的正式差距在对齐样本窗口后明显变小。r=20 的 IV 交叉矩数值秩是 229/231。不能据此判断 H5 的渐近命题。
+
+**下一步：** 停在第 1 部分。第 2 部分的参照算子已经在 `operators.npz`，带噪重复代码还没有写。若要看样本量，最小追加是再算缓存中的 `n_train=30` 和一个更大的干净训练集。本轮都不运行。
+
+**日志末尾：** `E5_PART1_DONE`，随后 `AUDIT_PROBLEMS 0`，pytest `132 passed`。
+
+## E5 共同窗口与数值可靠性对照 — 2026-11-03
+
+**远程 git commit：** 未提交。HEAD 仍是 `4ab0dc996976a782a3b65519f4782e7835a23605`。E4 冻结状态不变。H5 仍未确认。没有跑第 2 部分，没有增加训练规模，没有启动 E6–E8。
+
+**做了什么：** 写了 `reports/E5_TARGET_DIAGNOSTIC_PRERUN.md`，再在独立模块里分解窗口差和求解差。基直接读第 1 部分的 `basis.npz`，没有重新估计 POD。输出在 `results/e5_target_diagnostic_v1`。新图是 `figures/fig_e5_target_diagnostic.png`。原图和 `results/e5_part1` 没有覆盖。
+
+**测试状态：** `tests/test_e5_target_diagnostic.py` 10 passed、0 failed。诊断 `audit` 为 `AUDIT_PROBLEMS 0`。没有重跑全库。
+
+**关键数字：** r=20 上，IV2 相对本窗口 OLS 的整体相对偏离是 `0.001037927500020727`，相对全窗口仍是 `0.06352973479370896`。IV 本窗口相对偏离是 `0.06187497873427406`，与 QR 求解的相对差是 `1.060597544217496e-09`。只有 r=20 的 IV 交叉矩数值秩不足，为 229/231；`Q.T Z` 是 231/231。一步预测差是 `1.277550005511466e-13`。
+
+**与规格的偏离：** 无公式改动。本轮是事后诊断。第 1 部分报告里“每个噪声重复都做 POD”与 E5 的 `basis = clean` 不符；正确做法是冻结已有 clean 基。该句只在这次报告里更正，历史报告没有改，第 2 部分没有跑。
+
+**下一步：** 停在这里。固定样本量的噪声重复可以用来比较带噪均值和窗口匹配的干净参考，不能用来确认 H5 的下降条款。代码仍未写。
+
+## Journal manuscript closeout — 2026-11-20
+
+The final manuscript follows the finite-sample lagged-instrument question. See [the closeout decision](PUBLICATION_CLOSEOUT.md), [paper](../manuscript/paper.pdf), [fixed clean design](../publication/protocol.json) and [measured outputs](../publication/evidence/). The follow-up is separate from the historical E5 Part 2 and E6–E8 grid.

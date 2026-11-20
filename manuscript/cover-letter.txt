@@ -1,0 +1,12 @@
+Dear Editors of Numerical Algorithms,
+
+Please consider “How closely do lagged instruments reproduce least squares in operator inference?” for publication as a research article.
+
+When lagged snapshots serve as instruments, an observed difference from ordinary least squares combines the rows lost to lagging with the change in projection. We isolate the second effect and give the leading coefficient of the worst-case and response-specific changes in fitted values as the lag spacing shrinks. The result explains why a second lag can yield a fit almost indistinguishable from ordinary least squares on smooth trajectories, even when the reduced model has a substantial residual.
+
+The paper includes an analytic polynomial check and experiments on independent viscous Burgers and Allen–Cahn trajectory ensembles. We report held-out prediction error separately from agreement between the two fitted models. A measurement-noise sensitivity check shows where the clean-data explanation loses practical force. The code, measured summaries, and editable manuscript are available in the accompanying repository.
+
+Hanqing Yang
+Corresponding author, on behalf of Yunjie Guo and Hanqing Yang
+Independent researchers, Suzhou, China
+hanqing.yang189@gmail.com
