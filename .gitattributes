@@ -1,2 +1,4 @@
 * text=auto eol=lf
 publication/evidence/*.csv -text
+publication/evidence/derivative/seal.json -text
+publication/evidence/derivative/*.csv -text
