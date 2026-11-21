@@ -1,0 +1,31 @@
+\section{A measured example in tide-gauge records}
+A tide gauge records height while flood and ebb can pass through the same height with opposite velocities. This makes height alone a deliberately incomplete state. For a sinusoid sampled over complete cycles, the mechanism is explicit. With a constant and the current height as features, the OLS slope at horizon $\tau$ is $\cos(\omega\tau)$. The one-lag slope is $\cos(\omega(\tau+h))/\cos(\omega h)$ whenever the denominator is nonzero. Their difference is $-\tan(\omega h)\sin(\omega\tau)$, with leading term $-\omega^2 h\tau$. At generic spacings, two lags of a pure sinusoid span both phases and give zero change from OLS. Multiple constituents and nontidal variation make the two-lag question empirical. We used observed water levels to test both lag counts.
+
+We fixed eight US stations and obtained verified six-minute NOAA CO-OPS observations for January, July and October 2024 in metres above mean lower low water, with times in GMT \cite{noaa}. We excluded flagged or missing measurements and retained a common set of anchor times across all nine pairs $h,\tau\in\{30,60,90\}$ minutes in each month. January anchors also required a complete derivative window. We prespecified a minimum usable fraction of 70\% of the month. The response was subsequent measured height. Each design had an intercept and current height as its only dynamic feature. This benchmarks the sensitivity of a height-only fit. Operational tide prediction uses additional information about tidal constituents \cite{harmonics}.
+
+\paragraph{Transfer between months.}
+Let $x_c=x-\bar x$ on the current month's anchors. For the scalar dictionary, the signed leading change is $-k_m(h,\tau)A_m x_c$, where $k_1=h\tau$ and $k_2=h^2\tau(\tau+3h)/2$. The derivative energy ratio is $A_m=\|(I-P_{\mathcal J})x^{(m)}\|^2/\|x_c\|^2$. For each station, we estimated both ratios exclusively from January, using cubic local least squares over centered windows of $\pm60$ minutes. We sealed these coefficients before fitting the July and October regressions. Only the current anchor heights and their mean enter the prediction in either evaluation month. Transfer of $A_m$ across seasons is an additional empirical assumption beyond Theorem~4. The measured reference was the signed difference of direct IV and OLS fits on the same rows of each evaluation month. With one scalar and an intercept all fitted changes are multiples of $x_c$, so this experiment tests sign and magnitude; the earlier matrix tests also assess multivariate orientation.
+
+\paragraph{Materiality and accuracy.}
+Before scoring, we selected $h=\tau=60$ minutes as the primary setting. To qualify, a station had to meet three criteria in \emph{each} evaluation month: the RMS fitted difference was at least 2 cm, its norm was at least 5\% of the measured height-increment norm, and the signed relative error of the January prediction was at most 25\%. These are numerical reporting thresholds chosen for this study. At least four qualifying stations constituted the prespecified cross-station result for each lag count. Table~\ref{tab:tides} shows each station's least favorable value for each criterion.
+
+\begin{table}[ht]\centering\small
+\caption{Verified gauge heights at $h=\tau=60$ min. Under each lag count the columns show the smaller RMS fitted difference (cm), the smaller share of the increment (\%), and the larger signed relative error (\%) across July and October.}\label{tab:tides}
+\begin{tabular}{lrrrrrr}\toprule
+&\multicolumn{3}{c}{One lag}&\multicolumn{3}{c}{Two lags}\\
+Station & cm & Share & Error & cm & Share & Error\\\midrule
+\tableinput tide_table.tex
+\bottomrule\end{tabular}
+\end{table}
+
+Six of the eight stations qualified for one lag. At Boston, the July and October RMS differences were 26.2 and 25.5 cm, respectively, about 53\% of the measured hourly change in each month. The January prediction had at most 5.3\% relative error there. The six-site count was unchanged with 42- and 90-minute derivative half-windows. Galveston and San Francisco had too few eligible January anchors and count as failures; correlated tide forcing and repeated months preclude interpreting the eight sites as independent trials.
+
+For two lags, no station met the joint size and accuracy criteria in both months at any grid pair (Table~\ref{tab:tidegrid}). At Seattle the two-lag gap approached the absolute threshold, but its smaller monthly share was 3.9\% and the larger error was 25.8\%. For the one-lag model, transferring the fitted January regressions themselves to the twelve eligible evaluation station-months gave median forecast RMSEs of 25.3 cm for OLS and 28.1 cm for IV. IV had higher RMSE in all twelve. Thus the measurable one-lag effect diagnoses the cost of changing the fit in this height-only model.
+
+\begin{table}[ht]\centering\small
+\caption{Number of tide stations, out of eight enrolled, meeting all three criteria in both evaluation months. Each cell gives one lag / two lags.}\label{tab:tidegrid}
+\begin{tabular}{lrrr}\toprule
+$h\backslash\tau$ (minutes) & 30 & 60 & 90\\\midrule
+\tableinput tide_grid.tex
+\bottomrule\end{tabular}
+\end{table}

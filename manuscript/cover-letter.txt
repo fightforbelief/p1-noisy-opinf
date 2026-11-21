@@ -6,6 +6,8 @@ Lagged instruments are used to change the projection defining a regression fit. 
 
 The paper tests an observable implication of the formula. We sealed numerical predictions before fitting the instruments on new viscous Burgers and Allen–Cahn ensembles. We then crossed the two time scales on a separately specified Lorenz–96 experiment, comparing the joint formula with the approximation obtained by taking the limits sequentially. The article reports the ranges of finite spacings where the expansion predicts both direction and magnitude, together with failures, time-step sensitivity and a snapshot-only check. A post hoc test recovers the predicted mixed coefficient of three and quantifies the size of the fitted difference relative to the state increment.
 
+We also tested the practical size of the effect using public measurements. The one-lag formula predicted centimeter-scale changes at six tide gauges in two separate evaluation months. For two lags we found no repeated setting on either tide height or vertical foot force where the fitted difference was both material and predicted within the specified tolerance. The manuscript reports these failures alongside the controlled smooth-trajectory results.
+
 The manuscript, source code, protocols, signed matrix forecasts and complete block-level scores are available at https://github.com/fightforbelief/p1-noisy-opinf.
 
 Hanqing Yang

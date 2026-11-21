@@ -1,0 +1,18 @@
+\section{Two lags in measured foot-loading cycles}
+The tide experiment left open whether a measurable two-lag effect survives on a signal with several time scales. During walking, the force under one foot changes over a stride and more rapidly around contact and release. We specified a second experiment using the first numbered trial of each of the first twelve numbered control participants in the Ga cohort of the PhysioNet gait database \cite{gait,physionet}. The insoles recorded eight vertical forces under each foot at 100 Hz. Our sole dynamic feature and response variable was total left-foot force in newtons. Total bilateral force supplied a physical normalization.
+
+We specified two targets before scoring. One used the recorded force with only time-grid alignment. The other used its offline low-frequency component, obtained with a fourth-order 6 Hz Butterworth filter applied forward and backward. Filtering changes the target and requires observations on both sides of each sample. We divided each record into three consecutive thirds, split at intersample intervals outside 8--12 ms, and resampled each resulting run on a 10 ms grid. Filtering stayed inside each run and third. We discarded one second at each end before forming common lag and response windows; a third required at least 15 s of eligible anchors. The first third alone supplied the derivative energy, estimated with a quartic local polynomial over $\pm30$ ms and sealed before scoring the two later thirds. Coefficients were participant-specific. The two later segments test within-record transfer.
+
+The primary setting was $h=\tau=40$ ms. To qualify, the RMS difference between matched two-lag and OLS fits had to reach both 1\% of the mean bilateral load and 5\% of the target increment RMS, with signed relative prediction error at most 25\% in \emph{each} later third. Six qualifying participants out of twelve were required for each target separately. These scales describe fitted force changes. No clinical outcome was assessed.
+
+All twelve participants met both size thresholds on the recorded target in both later thirds at 40 ms. Eleven met both on the filtered target. No participant met the 25\% accuracy threshold in both thirds for either target at this step. Pooling the 24 later segments, the median change was 17.06 N for recorded force and 13.33 N for filtered force. The joint law predicted median magnitudes 13.86 and 1.71 times the observed magnitudes, respectively. Using 40 or 50 ms derivative half-windows also gave zero joint passes at the primary setting. Applied to the later thirds, the first-third two-lag fit had higher forecast RMSE than the corresponding OLS fit in all 24 segments for each target.
+
+\begin{table}[ht]\centering\small
+\caption{Measured two-lag force changes at equal spacing and horizon. Entries are medians over the 24 later segments of twelve participants. Load is mean bilateral force; increment is the left-force change over the horizon. The final column measures error in the predicted fitted difference.}\label{tab:force}
+\begin{tabular}{lrrrrr}\toprule
+Target & Step (ms) & Gap (N) & Load (\%) & Increment (\%) & Error (\%)\\\midrule
+\tableinput force_table.tex
+\bottomrule\end{tabular}
+\end{table}
+
+The filtered target illustrates the tradeoff (Table~\ref{tab:force}). At 20 ms the median error fell to 13.5\%, but the median gap fell to 1.27 N, only 0.13\% of bilateral load. Across the full nine-point grid, no participant met all thresholds in both validation thirds for either target. The calibration segments, derivative bandwidths, target definitions and tested grid bound this negative finding. No universal exclusion of practically significant two-lag effects follows.

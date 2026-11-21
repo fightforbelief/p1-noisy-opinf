@@ -12,6 +12,8 @@ On the prespecified external small-step region, block-median relative errors in 
 
 A post hoc comparison recalibrated the separable formula on seven Lorenz–96 blocks at a time. Its median error in the omitted block was 69.45%–69.50%. The fitted differences themselves had block medians of 4.26–6.15 parts per million of the state increment. The revised derivation credits the known sketched-regression angle bound, gives an analytic extension for deficient derivative matrices, and checks the unequal-scale formula with exact rational fits. [Block-level diagnostics](publication/evidence/crossover/review_blocks.csv)
 
+Measured water levels show a material one-lag displacement at six of eight enrolled gauges in both later months. The two-lag criteria were met at zero tide stations and by zero participants across the measured-force grid, including the predefined offline low-pass target. At 40 ms the recorded force gap reached a median 17.06 N, but its magnitude was substantially overpredicted. [Tide scores](publication/evidence/tides/scores.csv) · [Force scores](publication/evidence/force/scores.csv)
+
 ## Reproduce the paper
 
 Use Python 3.12 from the project root. The recorded project environment is Windows with Python 3.12.10. For an existing project environment, skip its creation. The simulation uses four worker processes with single-threaded BLAS. From a fresh checkout in PowerShell:
@@ -49,12 +51,23 @@ To regenerate the prospective predictions and new scores on Windows, use a fresh
 
 The PDE scores have 896 primary evaluations across 16 blocks and 112 temporal-refinement comparisons reusing two of those blocks. The auxiliary snapshot study repeats the same 896 evaluations. External scores contain 512 primary evaluations across eight independent blocks and 64 refinements. Multiple ranks, horizons and spacings within a block share data. The seal metadata fingerprints the calculation's original inputs. Re-compressed NumPy archives and time stamps can differ across platforms; numeric comparisons and matrix scores are the reproducibility criteria.
 
+The measured applications use the archived inputs. The NOAA archive contains verified station-month responses with their request URLs. The PhysioNet archive contains time and left/right total-force columns from twelve public control records. Its [attribution and license](publication/evidence/force/ATTRIBUTION.md) cover the extracted database. To replay both transfers from the root, choose fresh output directories.
+
+~~~powershell
+& $py publication/tide_study.py calibrate publication/evidence/tides/observations.tar.xz results/replay-tides
+& $py publication/tide_study.py score publication/evidence/tides/observations.tar.xz results/replay-tides
+& $py publication/force_study.py calibrate publication/evidence/force/observations.npz results/replay-force
+& $py publication/force_study.py score publication/evidence/force/observations.npz results/replay-force
+~~~
+
 To rebuild all manuscript tables and figures from the published data, run the following from the project root, then compile in the manuscript directory. Tectonic is a separate LaTeX tool. The submission source files are flat in that directory.
 
 ~~~powershell
 & $py publication/render_results.py
 & $py publication/render_derivatives.py
 & $py publication/render_crossover.py
+& $py publication/render_tides.py
+& $py publication/render_force.py
 Set-Location manuscript
 tectonic paper.tex
 ~~~

@@ -4,3 +4,9 @@ publication/evidence/derivative/seal.json -text whitespace=cr-at-eol
 publication/evidence/derivative/*.csv -text whitespace=cr-at-eol
 publication/evidence/crossover/seal.json -text whitespace=cr-at-eol
 publication/evidence/crossover/*.csv -text whitespace=cr-at-eol
+publication/evidence/tides/seal.json -text whitespace=cr-at-eol
+publication/evidence/tides/*.csv -text whitespace=cr-at-eol
+publication/evidence/tides/*.xz binary
+publication/evidence/force/seal.json -text whitespace=cr-at-eol
+publication/evidence/force/*.csv -text whitespace=cr-at-eol
+publication/evidence/force/*.npz binary
