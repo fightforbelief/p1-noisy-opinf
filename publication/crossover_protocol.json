@@ -1,0 +1,10 @@
+{
+  "system":"Lorenz-96", "n":40, "forcing":8.0, "blocks":8, "trajectories":32,
+  "seed":20261121, "spinup":5, "spinup_step":0.005, "tick":0.00025,
+  "first_anchor":200, "last_anchor":3800, "stride":100,
+  "h_ticks":[2,10,20,50], "tau_ticks":[1,5,20,100], "ranks":[6,10], "lags":[1,2],
+  "estimand":"Change in fitted next-state values on common anchors. Both predictions use only the instantaneous state and equation derivatives. Joint coefficient for m=2 is h^2*tau*(tau+3*h)/2; separable comparator drops the 3*h term. For m=1 they coincide.",
+  "provenance":"External validation after examining the earlier Burgers and Allen-Cahn results. This grid and both formulas were fixed before generating Lorenz-96 trajectories.",
+  "primary":"For m=2 and h,tau<=0.005, summarize each independent block by its median signed-matrix relative error over ranks and eligible grid points. Criterion: in at least seven of eight blocks the joint median is <=0.25 and lower than the separable median. Score all 16 step pairs including outside this primary region. Row-level accuracy uses e<=0.25 and cosine>=0.95. Rank failures or displacements below 1e-13 times the state increment norm count as failures.",
+  "integration":"Independent initial states F+N(0,1) per coordinate, run classical RK4 for five spin-up time units and one ensuing segment. Time step in the analyzed segment is one tick. For block 0 halve only the analyzed segment step starting from the same spin-up states. Compare in full state coordinates."
+}
