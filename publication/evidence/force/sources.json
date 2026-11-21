@@ -1,0 +1,50 @@
+{
+  "GaCo01": {
+    "url": "https://physionet.org/files/gaitpdb/1.0.0/GaCo01_01.txt",
+    "sha256": "81bcedc0f72c1c6804d7830627431a6c1b76e9ddb42de0cf1ae2f418848c13a4"
+  },
+  "GaCo02": {
+    "url": "https://physionet.org/files/gaitpdb/1.0.0/GaCo02_01.txt",
+    "sha256": "8e36793cbe901f5fd1f14af2e553353978f2a997b2121b41dcc0e05b8c64d87f"
+  },
+  "GaCo03": {
+    "url": "https://physionet.org/files/gaitpdb/1.0.0/GaCo03_01.txt",
+    "sha256": "ca21dadbd47f5f56ac37ea6cf3067d0f98e8936bb2830396aa3c5b0d387db216"
+  },
+  "GaCo04": {
+    "url": "https://physionet.org/files/gaitpdb/1.0.0/GaCo04_01.txt",
+    "sha256": "26993b245b8af95d54260d58eeca5bf6763b7a31a27d765c0956f25c80deb470"
+  },
+  "GaCo05": {
+    "url": "https://physionet.org/files/gaitpdb/1.0.0/GaCo05_01.txt",
+    "sha256": "0f27d32fe94b4625c63c1e8d8e4d928b2ecb298449ef13a4720b5cb7ce9137bf"
+  },
+  "GaCo06": {
+    "url": "https://physionet.org/files/gaitpdb/1.0.0/GaCo06_01.txt",
+    "sha256": "8aa3f20001fc1a7ffa6817798fd3725e9c03d17a2d26dea9d2074204e3c1393f"
+  },
+  "GaCo07": {
+    "url": "https://physionet.org/files/gaitpdb/1.0.0/GaCo07_01.txt",
+    "sha256": "da3abce1fcc869579532d403dd83e7721f5e7d26638b477de2d2f22ba3296751"
+  },
+  "GaCo08": {
+    "url": "https://physionet.org/files/gaitpdb/1.0.0/GaCo08_01.txt",
+    "sha256": "d3b841f9c2f87f32695e94ea9484c0676a26219adf9e1c3bbd333dff12694b35"
+  },
+  "GaCo09": {
+    "url": "https://physionet.org/files/gaitpdb/1.0.0/GaCo09_01.txt",
+    "sha256": "eb147fc7720d3a9b6a2d49cf0c933f3aa2fdd8e69034cf7b950458b47a9bf740"
+  },
+  "GaCo10": {
+    "url": "https://physionet.org/files/gaitpdb/1.0.0/GaCo10_01.txt",
+    "sha256": "3366191a37c3a2690b4de37cad163147c9830d249cede12974d2950a646f5dc0"
+  },
+  "GaCo11": {
+    "url": "https://physionet.org/files/gaitpdb/1.0.0/GaCo11_01.txt",
+    "sha256": "8a63bb940b4ce6c47b9671f4c079f69e442d03861f77fe00b054628656dc70df"
+  },
+  "GaCo12": {
+    "url": "https://physionet.org/files/gaitpdb/1.0.0/GaCo12_01.txt",
+    "sha256": "dd7fb0d273e22bad4cad4148f2c485c7211a8c2dec711ce72abedfb904bf3d0d"
+  }
+}
