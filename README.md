@@ -4,7 +4,7 @@
 
 Yunjie Guo and Hanqing Yang · Independent Researcher, Suzhou, China
 
-[Read the paper](manuscript/paper.pdf) · [Editable LaTeX](manuscript/paper.tex) · [Measured data](publication/evidence) · [Experiment protocol](publication/protocol.json)
+[Read the paper](manuscript/paper.pdf) · [Download the submission package](publication/P1-Numerical-Algorithms.zip) · [Editable LaTeX](manuscript/paper.tex) · [Measured data](publication/evidence) · [Experiment protocol](publication/protocol.json)
 
 For smooth trajectories, the spacing between lagged instruments and the forward prediction horizon jointly determine how much two-stage least squares changes fitted values. For two equally spaced lags, the signed leading matrix has scalar factor **h²τ(τ+3h)/2**. Ignoring the mixed term gives one quarter of the leading magnitude at τ = h. The paper proves a uniform two-parameter expansion and tests signed predictions on held-back viscous Burgers, Allen–Cahn and Lorenz–96 ensembles. It also reports a clean snapshot-only derivative check, a closed-vector-field exception and a measurement-noise sensitivity study.
 
