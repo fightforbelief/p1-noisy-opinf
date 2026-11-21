@@ -1,0 +1,11 @@
+{
+  "source": "NOAA CO-OPS verified six-minute observed water_level, metric, GMT, MLLW",
+  "stations": {"8443970":"Boston", "8518750":"The Battery", "8665530":"Charleston", "8724580":"Key West", "8771450":"Galveston Pier 21", "9414290":"San Francisco", "9447130":"Seattle", "1612340":"Honolulu"},
+  "months": ["202401", "202407", "202410"],
+  "step_minutes": 6, "lag_minutes": [30,60,90], "horizon_minutes": [30,60,90], "lags": [1,2],
+  "derivative": "Cubic local least squares on the January height observations in centered windows. Use +/-60 minutes for primary coefficients and +/-42 and +/-90 for sensitivity. Derivative units per hour. All fits have an intercept and one dynamic feature, measured height.",
+  "filter": "Accept finite verified observations with all NOAA quality flags zero. Do not impute. A month uses a common set of anchors valid at every scored lag, response and current time; January additionally requires the full +/-90 minute derivative window. At least 70% of the six-minute month must be eligible; otherwise retain the site as a failure in the eight-site denominator.",
+  "calibration": "January alone supplies each station's two derivative coefficients. Freeze them before scoring July or October. Center the predicted displacement on the evaluation month's current heights as required by the intercept. No evaluation outcomes tune coefficients, stations, rank, windows or steps.",
+  "decision": "Evaluate one and two lags separately. The primary operating point is h=tau=60 minutes. A station must meet all three thresholds in BOTH July and October: RMS measured gap >=0.02 m, gap norm >=5% of the measured height increment norm, and signed relative displacement error <=25%. Report wider support if at least four of eight stations qualify; identify any individual qualifying sites even below four. The two-centimeter and 5% criteria are author-chosen numerical effect sizes. The complete 3-by-3 grid is secondary and does not change this decision.",
+  "context": "Report the separable two-lag comparator, all site-month cells, and actual forecast RMSE applying January OLS and IV fits to later months. Distinguish the estimated displacement between local matched fits from forecasting the water level. Sites can share forcing; months/sites are not treated as independent trials. No use of the agency's tide predictions."
+}
