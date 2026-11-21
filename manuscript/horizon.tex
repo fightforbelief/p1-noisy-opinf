@@ -13,7 +13,7 @@ Under the smoothness and rank conditions of Theorem~2, the change in the fitted 
 \begin{equation}
  D_{W_h}=-h^{2m}\alpha\{b(c)-\alpha\}\,U L^T G+o(h^{2m}). \label{eq:coupled}
 \end{equation}
-If $G\ne0$, this leading matrix is nonzero. For the equally spaced one-step experiment $a_j=j$ and $c=1$, the scalar multiplier is $m$. If also $(I-UU^T)q'(0)\ne0$, the residual-normalized change $s_{W_h}$ has exact order $h^{2m-1}$.
+If $G\ne0$, this leading matrix is nonzero. For the equally spaced one-step experiment $a_j=j$ and $c=1$, the scalar multiplier is $m$. If both $G\ne0$ and $(I-UU^T)q'(0)\ne0$, the residual-normalized change $s_{W_h}$ has exact order $h^{2m-1}$.
 
 \paragraph{Proof.}
 Let $P_h$ project onto the instrument columns. Lagrange extrapolation from the $m$ lag times to $ch$ reproduces polynomials up to degree $m-1$. Its error on the monomial $s^m$ is $h^m\prod_j(c+a_j)$. Taylor expansion on the fixed rows and convergence of the divided-difference spaces therefore give
@@ -36,7 +36,7 @@ The nondegeneracy condition has a concrete consequence in system identification.
 The preceding result fixes the ratio of the prediction horizon to the lag spacing. In experiments the acquisition interval and the desired forecast horizon are often chosen separately. The following expansion remains informative even if their ratio tends to zero or infinity.
 
 \paragraph{Theorem 4 (uniform two-time-scale expansion).}
-Assume the hypotheses of Theorem~3 and $F\in C^{m+1}$ in a neighborhood of the anchors. Write $\tau>0$ for the forward horizon and $\pi_h(s)=\prod_{j=1}^m(s+a_jh)$. As $h,\tau\downarrow0$ independently,
+Fix $m$, the anchor rows and the positive distinct lag multipliers. Assume $q(s)=Z(s)S$, the full-column-rank condition of Theorem~2, and $F\in C^{m+1}$ in a neighborhood of the anchors. Write $\tau>0$ for the forward horizon and $\pi_h(s)=\prod_{j=1}^m(s+a_jh)$. As $h,\tau\downarrow0$ independently,
 \begin{equation}
  D(h,\tau)=
  -\frac{\alpha h^m}{m!}\{\pi_h(\tau)-\pi_h(0)\}\,U L^TG
@@ -54,10 +54,28 @@ Here $d_h$ is the divided difference of order $m$ at the $m$ lag nodes and $s$. 
  N_h[q(\tau)-q(0)]
  = \{\pi_h(\tau)-\pi_h(0)\}G/m!+O\!\left(\tau(h+\tau)^m\right).
 \]
-Indeed $\pi_h(\tau)=O((h+\tau)^m)$ and $\pi_h(\tau)-\pi_h(0)$ is bounded above and below by positive constants times $\tau(h+\tau)^{m-1}$, by positivity of its polynomial coefficients. The OLS residual at $\tau$ is $(I-UU^T)[q(\tau)-q(0)]$. Applying $N_h$ changes the last display by $-V_hU^T[q(\tau)-q(0)]=O(h^m\tau)$. In \eqref{eq:shift}, $C_h^{-1}=I+O(h^{2m})$, since $I-C_h=V_h^TV_h$. Multiplication by $-UC_h^{-1}V_h^T$ proves \eqref{eq:joint}. The lower bound on the polynomial difference and $G^TG=(RS)^TL^TG$ give the relative statement. \hfill\rule{1ex}{1ex}
+The two errors have orders $O(h)[\pi_h(\tau)-\pi_h(0)]$ and $O(\tau)\pi_h(\tau)$. The first accounts for replacing $N_h$ by $I-P_{\mathcal J}$ on $q^{(m)}(0)$. Both are $O(\tau(h+\tau)^m)$. Indeed $\pi_h(\tau)=O((h+\tau)^m)$ and $\pi_h(\tau)-\pi_h(0)$ is bounded above and below by positive constants times $\tau(h+\tau)^{m-1}$, by positivity of its polynomial coefficients. The OLS residual at $\tau$ is $(I-UU^T)[q(\tau)-q(0)]$. Applying $N_h$ changes the last display by $-V_hU^T[q(\tau)-q(0)]=O(h^m\tau)$. In \eqref{eq:shift}, $C_h^{-1}=I+O(h^{2m})$, since $I-C_h=V_h^TV_h$. Multiplication by $-UC_h^{-1}V_h^T$ proves \eqref{eq:joint}. The lower bound on the polynomial difference and $G^TG=(RS)^TL^TG$ give the relative statement. \hfill\rule{1ex}{1ex}
 
 For consecutive, equally spaced instruments, the scalar multiplying $-UL^TG$ is $h\tau$ for one lag and
 \begin{equation}
  \tfrac12 h^2\tau(\tau+3h)\qquad\text{for two lags}. \label{eq:cross}
 \end{equation}
-Holding $\tau$ fixed in Theorem~2 and then expanding its coefficient for small $\tau$ retains only $h^2\tau^2/2$. At $\tau=h$ this predicts one quarter of the joint leading magnitude; at $\tau\ll h$ the missing term dominates. For a nonzero leading matrix the relative loss from dropping the mixed term is exactly $3h/(\tau+3h)$ at leading order. Keeping this contribution below one quarter therefore requires $\tau>9h$. This is a design rule for the two leading coefficients. At finite spacings each approximation also has a remainder. Both predictions have the same leading direction. This yields a discriminating test on new data: vary the ratio of the two intervals and check the signed matrix relative error, including pairs on either side of $\tau=h$.
+For the fixed-horizon coefficient in Theorem~2 we have $L^TE(\tau)=L^Tq(\tau)$, since $U^TL=0$. The columns of $q(0),\ldots,q^{(m-1)}(0)$ belong to $\mathcal J$, so $L^TE(\tau)=\tau^m L^TG/m!+O(\tau^{m+1})$. Expanding this coefficient after taking the small-$h$ limit retains only $h^2\tau^2/2$ for two lags. At $\tau=h$ this predicts one quarter of the joint leading magnitude; at $\tau\ll h$ the missing term dominates. For a nonzero leading matrix the relative loss from dropping the mixed term is exactly $3h/(\tau+3h)$ at leading order. Keeping this contribution below one quarter therefore requires $\tau>9h$. This is a design rule for the two leading coefficients. At finite spacings each approximation also has a remainder. Both predictions have the same leading direction. This yields a discriminating test on new data: vary the ratio of the two intervals and check the signed matrix relative error, including pairs on either side of $\tau=h$.
+
+
+\paragraph{Computing the joint prediction.}
+For a full-rank derivative matrix, one factorization serves the entire $(h,\tau)$ grid. Form a thin orthonormal basis $Q_J$ of the derivative space by a rank-revealing factorization. Set $B=[0,F^{(m)}(0)]$ and residualize its columns, $B_\perp=B-Q_J(Q_J^TB)$. With the current QR factor $R$, solve
+\[
+ R^T K=-B_\perp^T(B_\perp S).
+\]
+Then $K=-L^TG$. Multiply $K$ by the positive scalar in \eqref{eq:joint} to predict the displacement in $U$ coordinates. Multiplication by $U$ is needed only to return to sample coordinates. The largest factorization has as many columns as the derivative matrix; no $n$-by-$n$ projector or fitted lagged regression is required. Small singular values of that matrix make the computed coefficient sensitive. We record numerical rank and check step refinement separately from the asymptotic error.
+
+\paragraph{Analytic dictionaries with redundant derivative columns.}
+For a full-rank current design $Z$ and a real analytic $F$ near the anchors, let $P_* = \lim_{h\downarrow0}P_h$. This limit exists and $P_h=P_*+O(h)$ even when the derivative matrix is rank deficient. In Theorem~4 replace $P_{\mathcal J}$ by $P_*$ in both $L$ and $G$. The expansion and its nondegeneracy test then hold with these coefficients.
+
+To prove existence, choose a maximal minor of the analytic instrument matrix that is not identically zero near zero. Its selected columns form a basis $B(h)$ for all sufficiently small positive $h$, since the minor has an isolated zero at worst and all larger minors vanish identically. Each entry of $B(B^TB)^{-1}B^T$ is a quotient of analytic functions of one variable. On the punctured interval these entries are bounded by one, so any zero of the denominator at the origin is removable. The extended projector is analytic there. Limits of scaled divided differences show that $\mathcal J\subseteq\operatorname{ran}(P_*)$. Taylor extrapolation and the subtraction in the proof of Theorem~4 now use $I-P_*$ throughout. The same Gram identity gives nonvanishing when $G\ne0$.
+
+Equality of the two spaces can fail. At five or more distinct positive anchors $t_i$, take an intercept and features $(t+s)^4,(t+s)^3$, with the second feature as response. With two lags the derivative space spans $1,t^2,t^3,t^4$, so it misses the response derivative $6t$. The two lag blocks and the intercept span every polynomial of degree at most four for each $h>0$. Indeed, in the shifted variable $x=t-h$, eliminating the cubic and quartic terms from $(x-h)^4,(x-h)^3$ leaves two quadratic and linear coefficient pairs with determinant $6h^4$ up to sign. Thus $P_hZ=Z$ and the fitted displacement vanishes identically. Substitution of the deficient derivative space would incorrectly predict a nonzero quartic term. The analytic extension describes this boundary but may require higher derivatives to compute $P_*$; the numerical protocol uses the full-rank test.
+
+\paragraph{Exact-arithmetic check of unequal scales.}
+The replication suite solves the ordinary and instrumented normal equations separately in rational arithmetic on a quartic trajectory with a constant column and eleven distinct anchors $t_i=i/9$, $1\le i\le11$. For $m=1,2,3$ the lag multipliers are successive prefixes of $(1/2,2,3)$. Along $(h,\tau)=(\epsilon,\epsilon^2)$ and $(\epsilon^2,\epsilon)$, with $\epsilon$ decreasing from $1/128$ to $1/1024$ by successive halvings, the two ratios tend in opposite directions. The leading prediction is evaluated from the polynomial derivative projected onto the complement of $\mathcal J$. In all six paths each halving reduced the squared relative error by more than half. These checks exercise the subtraction in \eqref{eq:joint} even when the displacement is too small for a direct subtraction of floating-point fits.

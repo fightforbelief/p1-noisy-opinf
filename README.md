@@ -10,6 +10,8 @@ For smooth trajectories, the spacing between lagged instruments and the forward 
 
 On the prespecified external small-step region, block-median relative errors in the predicted displacement were 2.36%–2.74% for the joint law versus about 85.7% for the separable approximation. The protocols and pre-score prediction digests are versioned. [PDE protocol](publication/derivative_protocol.json) · [PDE predictions and scores](publication/evidence/derivative) · [External validation protocol](publication/crossover_protocol.json) · [Lorenz–96 predictions and scores](publication/evidence/crossover)
 
+A post hoc comparison recalibrated the separable formula on seven Lorenz–96 blocks at a time. Its median error in the omitted block was 69.45%–69.50%. The fitted differences themselves had block medians of 4.26–6.15 parts per million of the state increment. The revised derivation credits the known sketched-regression angle bound, gives an analytic extension for deficient derivative matrices, and checks the unequal-scale formula with exact rational fits. [Block-level diagnostics](publication/evidence/crossover/review_blocks.csv)
+
 ## Reproduce the paper
 
 Use Python 3.12 from the project root. The recorded project environment is Windows with Python 3.12.10. For an existing project environment, skip its creation. The simulation uses four worker processes with single-threaded BLAS. From a fresh checkout in PowerShell:
@@ -41,6 +43,7 @@ To regenerate the prospective predictions and new scores on Windows, use a fresh
 & $py publication/snapshot_check.py --output results/replay-pde
 & $py publication/crossover.py seal --output results/replay-l96
 & $py publication/crossover.py score --output results/replay-l96
+& $py publication/review_crossover.py results/replay-l96 results/review-blocks.csv
 & $py publication/check_replay.py results/replay-pde results/replay-l96
 ~~~
 

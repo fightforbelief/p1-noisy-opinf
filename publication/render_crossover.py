@@ -59,6 +59,18 @@ macros={"JointPctLo":f"{100*paired.error.min():.2f}","JointPctHi":f"{100*paired.
         "SepHi":f"{paired.separable_error.max():.3f}",
         "ExternalInvalid":str(sum(d.valid==0)),
         "ExternalRefine":f"{d.refine_error.max():.2g}"}
+review = pd.read_csv(DATA / "review_blocks.csv").set_index("block").sort_index()
+assert review.index.tolist() == list(range(SPEC["blocks"])) and (review.cells == 18).all()
+assert np.isfinite(review.to_numpy()).all()
+np.testing.assert_allclose(review.joint_median_error, paired.error, rtol=1e-11)
+for variable, prefix, multiplier, precision in [
+    ("intercept", "ReviewA", 1, 4), ("mixed_coefficient", "ReviewB", 1, 4),
+    ("calibrated_median_error", "ReviewCal", 100, 2),
+    ("median_increment_share", "ReviewPPM", 1e6, 2),
+]:
+    values = review[variable] * multiplier
+    macros[prefix+"Lo"] = f"{values.min():.{precision}f}"
+    macros[prefix+"Hi"] = f"{values.max():.{precision}f}"
 (OUT/"external_numbers.tex").write_text("".join("\\newcommand{\\"+k+"}{"+v+"}\n" for k,v in macros.items()))
 print("block medians\n",paired,"passes",passed.sum())
 print("resolution checks",d.valid.value_counts().to_dict(),"direct",d.direct_error.max(),"refinement",d.refine_error.max())

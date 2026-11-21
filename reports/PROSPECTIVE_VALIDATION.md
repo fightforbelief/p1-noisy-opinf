@@ -33,3 +33,11 @@ All eight Lorenz–96 blocks met the predeclared joint-formula criterion in the 
 ## Reproduction check
 
 A fresh run in the Windows project environment regenerated the forecasts and scores for all three studies. The replay checker matched 1,008 PDE records, 896 snapshot records and 576 external records to the archived keyed results. The project test suite passed all 160 tests.
+
+## Referee sensitivity analysis
+
+These checks were designed after the external results were known. The primary protocol and scores remain at their original digests. The extra analysis uses all 18 primary two-lag evaluations per Lorenz–96 block. It fits the two coefficients of the leading polynomial using squared relative matrix errors, then evaluates a freely rescaled separable formula by leaving one whole block out. Across the eight blocks the fitted mixed coefficient ranges from 2.9913 to 2.9977 (theory 3), and the recalibrated separable formula gives held-out block medians of 69.45% to 69.50%. The measured fit difference is small in state units. Its block medians are 4.26 to 6.15 parts per million of the reduced state increment.
+
+Each block contributes one row to [the archived sensitivity table](../publication/evidence/crossover/review_blocks.csv). The six unequal-scale rational-arithmetic checks in [the exact controls](../publication/test_uniform_exact.py) use independently fitted normal equations. A seventh control demonstrates why two analytic lag spaces can have a limiting direction absent from the derivative matrix. These manufactured checks cover ratios approaching zero and infinity. No application-level noise robustness or improvement in forecasting is inferred from them.
+
+The Windows project environment reproduced the eight-row diagnostic table byte for byte from the separate full-trajectory replay. All 167 tests passed, including the seven new exact controls. The 13-page submission PDF also matched a standalone rebuild from the submission archive page by page in text and rendered pixels.
