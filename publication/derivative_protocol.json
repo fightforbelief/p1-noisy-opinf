@@ -1,0 +1,11 @@
+{
+  "systems": ["burgers", "allen_cahn"],
+  "first_index": 8000, "blocks": 8, "trajectories": 32, "split": 1,
+  "ranks": [6, 10], "lags": [1, 2],
+  "tick": 0.00025, "step_per_tick": 2, "lag_ticks": [1, 2, 4, 10, 20, 50, 100],
+  "anchor_first": 200, "anchor_last": 3800, "anchor_stride": 100, "fixed_horizon_ticks": 20,
+  "forecast": "On each new block construct the POD basis only from anchors. Use semidiscrete PDE time derivatives for the dictionary jet. Seal the signed leading matrix in reduced QR coordinates for fixed horizon (uses current OLS residual) and horizon equal to h (uses anchor derivatives only), and the angular leading constant. No lagged fit before the predictions for all blocks are persisted and their digest recorded.",
+  "score": "Primary: matrix error ||prediction-observation||_F/||observation||_F and Frobenius cosine; magnitude ratio secondary. Compare with zero-displacement error 1. Numerical resolution floor 1e-13 times the norm of the response increment. Rank failures and unresolved rows count as failures. Per block usable iff error <= 0.25 and cosine >= 0.95. Report largest contiguous grid prefix with at least 7/8 passing blocks at every spacing for each system, rank, lag and horizon. Show all spacings including failures, and independent-fit agreement.",
+  "refinement": "Repeat block zero of each equation with half the integration step at the same spatial resolution. Check numerical target sensitivity on all ranks, lags and horizons; this is a sensitivity check, not an extra independent ensemble.",
+  "provenance": "Internal prospective numerical protocol following the 2026-11-20 pilot; simulation is deterministic, no observational measurement noise in this extension."
+}
