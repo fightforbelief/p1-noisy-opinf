@@ -1,0 +1,63 @@
+\subsection{When the response moves with the instruments}
+In a sampled evolution law, shortening the sampling interval often changes two objects at once. The instruments move toward the current features and the response moves toward the current state. Applying the worst-case factor alone then loses an entire power of the interpolation error.
+
+Write $Z(s)=[A,F(s)]$, and suppose that a fixed matrix $S$ selects the state from the dictionary, $q(s)=Z(s)S$. Allow instrument times $-a_1h,\ldots,-a_mh$ for distinct fixed $a_j>0$. The response is $Y_h=q(ch)$ for a fixed $c>0$. Write
+\[
+ \alpha=\frac{\prod_{j=1}^m a_j}{m!},\qquad
+ b(c)=\frac{\prod_{j=1}^m(c+a_j)}{m!},\qquad
+ G=(I-P_{\mathcal J})q^{(m)}(0)=LRS .
+\]
+
+\paragraph{Theorem 3 (shrinking prediction horizon).}
+Under the smoothness and rank conditions of Theorem~2, the change in the fitted state obeys
+\begin{equation}
+ D_{W_h}=-h^{2m}\alpha\{b(c)-\alpha\}\,U L^T G+o(h^{2m}). \label{eq:coupled}
+\end{equation}
+If $G\ne0$, this leading matrix is nonzero. For the equally spaced one-step experiment $a_j=j$ and $c=1$, the scalar multiplier is $m$. If also $(I-UU^T)q'(0)\ne0$, the residual-normalized change $s_{W_h}$ has exact order $h^{2m-1}$.
+
+\paragraph{Proof.}
+Let $P_h$ project onto the instrument columns. Lagrange extrapolation from the $m$ lag times to $ch$ reproduces polynomials up to degree $m-1$. Its error on the monomial $s^m$ is $h^m\prod_j(c+a_j)$. Taylor expansion on the fixed rows and convergence of the divided-difference spaces therefore give
+\begin{align*}
+ (I-P_h)U &= h^m\alpha L+o(h^m),\\
+ (I-P_h)Y_h &= h^m b(c) G+o(h^m).
+\end{align*}
+The first line uses extrapolation to the current time and right multiplication by $R^{-1}$. In the second line the extrapolated state columns belong to the instrument space because $q(s)=Z(s)S$. Now let $E_h=(I-UU^T)Y_h$. Since $U^T Y_h\to RS$,
+\[
+ (I-P_h)E_h=h^m\{b(c)-\alpha\}G+o(h^m).
+\]
+In \eqref{eq:shift}, $[(I-P_h)U]^T E_h=[(I-P_h)U]^T(I-P_h)E_h$. Multiplying the two leading terms proves \eqref{eq:coupled}. Moreover $(RS)^TL^TG=G^TG$, so $L^TG$ cannot vanish when $G\ne0$. Finally $E_h=ch(I-UU^T)q'(0)+o(h)$, which yields the normalized order. \hfill\rule{1ex}{1ex}
+
+For one lag the typical absolute change is quadratic in $h$. For two it is quartic under the stated nondegeneracy conditions. A bound proportional only to the subspace angle cannot distinguish a distant response from the next state. Equation~\eqref{eq:coupled} explains the extra cancellation through the projection of the response residual. Its coefficient can be computed from the current state and its derivatives before fitting either lagged model. In contrast, the fixed-horizon coefficient in \eqref{eq:limit} also uses the ordinary least-squares residual at the chosen horizon. These are predictions of changes between fitted maps on specified rows. They require separate validation from forecasts of a future trajectory.
+
+\paragraph{A closed vector field.}
+The nondegeneracy condition has a concrete consequence in system identification. Take the scalar flow $q'=-q^2$, the dictionary $(q,q^2,1)$ and enough distinct positive anchor states to give full rank and $g=(I-UU^T)q^3\ne0$ (powers act entrywise). With one lag, $G=(I-UU^T)q'=0$, although the quadratic feature has derivative $-2q^3$ and the angular factor has a nonzero linear term. The exact state at horizon $h$ is $q/(1+hq)$. Thus $E_h=h^2 g+O(h^3)$ and \eqref{eq:shift} gives $D_{W_h}=-h^3 U L^T g+o(h^3)$. The leading matrix is nonzero because a column of $LR$ is $-2g$. A quadratic vector field can therefore agree with OLS to cubic order even though the discrete-time flow lies outside the quadratic dictionary. The replication tests evaluate this example and also compare \eqref{eq:coupled} with direct fits for unequal lag spacings and $c=1.75$.
+
+\subsection{Two time scales that approach zero independently}
+The preceding result fixes the ratio of the prediction horizon to the lag spacing. In experiments the acquisition interval and the desired forecast horizon are often chosen separately. The following expansion remains informative even if their ratio tends to zero or infinity.
+
+\paragraph{Theorem 4 (uniform two-time-scale expansion).}
+Assume the hypotheses of Theorem~3 and $F\in C^{m+1}$ in a neighborhood of the anchors. Write $\tau>0$ for the forward horizon and $\pi_h(s)=\prod_{j=1}^m(s+a_jh)$. As $h,\tau\downarrow0$ independently,
+\begin{equation}
+ D(h,\tau)=
+ -\frac{\alpha h^m}{m!}\{\pi_h(\tau)-\pi_h(0)\}\,U L^TG
+ +O\!\left(h^m\tau(h+\tau)^m\right). \label{eq:joint}
+\end{equation}
+The constants may depend on the finite design, the fixed lag multipliers and derivative bounds. If $G\ne0$, the relative matrix error of the leading prediction is $O(h+\tau)$ uniformly in $\tau/h$.
+
+\paragraph{Proof.}
+Set $N_h=I-P_h$ and $V_h=N_h U$. The divided-difference columns of the instruments differ from their limiting derivative columns by $O(h)$. Full rank and smooth dependence of the projector on a full-rank matrix imply $P_h=P_{\mathcal J}+O(h)$. Taylor extrapolation to zero consequently gives $V_h=\alpha h^m L+O(h^{m+1})$. For the response, let $H_h(s)$ be its Lagrange interpolant at the lag nodes. Write the interpolation remainder as
+\[
+ q(s)-H_h(s)=\pi_h(s)\,d_h(s).
+\]
+Here $d_h$ is the divided difference of order $m$ at the $m$ lag nodes and $s$. Its simplex integral representation gives $d_h(0)=q^{(m)}(0)/m!+O(h)$ and $\|d_h(\tau)-d_h(0)\|=O(\tau)$, since the next derivative is bounded \cite{deboor}. Every column of $H_h(s)$ belongs to the instrument space. Subtracting at $s=0$ before estimating the two remainders yields
+\[
+ N_h[q(\tau)-q(0)]
+ = \{\pi_h(\tau)-\pi_h(0)\}G/m!+O\!\left(\tau(h+\tau)^m\right).
+\]
+Indeed $\pi_h(\tau)=O((h+\tau)^m)$ and $\pi_h(\tau)-\pi_h(0)$ is bounded above and below by positive constants times $\tau(h+\tau)^{m-1}$, by positivity of its polynomial coefficients. The OLS residual at $\tau$ is $(I-UU^T)[q(\tau)-q(0)]$. Applying $N_h$ changes the last display by $-V_hU^T[q(\tau)-q(0)]=O(h^m\tau)$. In \eqref{eq:shift}, $C_h^{-1}=I+O(h^{2m})$, since $I-C_h=V_h^TV_h$. Multiplication by $-UC_h^{-1}V_h^T$ proves \eqref{eq:joint}. The lower bound on the polynomial difference and $G^TG=(RS)^TL^TG$ give the relative statement. \hfill\rule{1ex}{1ex}
+
+For consecutive, equally spaced instruments, the scalar multiplying $-UL^TG$ is $h\tau$ for one lag and
+\begin{equation}
+ \tfrac12 h^2\tau(\tau+3h)\qquad\text{for two lags}. \label{eq:cross}
+\end{equation}
+Holding $\tau$ fixed in Theorem~2 and then expanding its coefficient for small $\tau$ retains only $h^2\tau^2/2$. At $\tau=h$ this predicts one quarter of the joint leading magnitude; at $\tau\ll h$ the missing term dominates. For a nonzero leading matrix the relative loss from dropping the mixed term is exactly $3h/(\tau+3h)$ at leading order. Keeping this contribution below one quarter therefore requires $\tau>9h$. This is a design rule for the two leading coefficients. At finite spacings each approximation also has a remainder. Both predictions have the same leading direction. This yields a discriminating test on new data: vary the ratio of the two intervals and check the signed matrix relative error, including pairs on either side of $\tau=h$.

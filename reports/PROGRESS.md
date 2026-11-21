@@ -601,3 +601,7 @@ SNR 的 lower central median 写在运行前的提交 `8f90c7e` 里。这次 10 
 ## Journal manuscript closeout — 2026-11-20
 
 The final manuscript follows the finite-sample lagged-instrument question. See [the closeout decision](PUBLICATION_CLOSEOUT.md), [paper](../manuscript/paper.pdf), [fixed clean design](../publication/protocol.json) and [measured outputs](../publication/evidence/). The follow-up is separate from the historical E5 Part 2 and E6–E8 grid.
+
+## Two-time-scale revision — 2026-11-21
+
+The [new validation report](PROSPECTIVE_VALIDATION.md) records the separate PDE and external prediction seals, their chronology, the numerical controls and the limits of the evidence. The revision treats lag spacing and prediction horizon as independent variables.

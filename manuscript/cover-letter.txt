@@ -1,12 +1,14 @@
 Dear Editors of Numerical Algorithms,
 
-Please consider “How closely do lagged instruments reproduce least squares in operator inference?” for publication as a research article.
+Please consider “A two-time-scale law for lagged operator inference on smooth trajectories” as a research article.
 
-When lagged snapshots serve as instruments, an observed difference from ordinary least squares combines the rows lost to lagging with the change in projection. We isolate the second effect and give the leading coefficient of the worst-case and response-specific changes in fitted values as the lag spacing shrinks. The result explains why a second lag can yield a fit almost indistinguishable from ordinary least squares on smooth trajectories, even when the reduced model has a substantial residual.
+Lagged instruments are used to change the projection defining a regression fit. On finely sampled trajectories their feature space approaches the space of current features. The regression response can approach that space at the same time. We characterize the resulting cancellation and derive a signed leading matrix with a relative remainder uniform in the ratio of prediction horizon to lag spacing, under stated smoothness, rank and nondegeneracy conditions. For two lags the mixed term explains a factor-of-four discrepancy at equal forward and backward steps.
 
-The paper includes an analytic polynomial check and experiments on independent viscous Burgers and Allen–Cahn trajectory ensembles. We report held-out prediction error separately from agreement between the two fitted models. A measurement-noise sensitivity check shows where the clean-data explanation loses practical force. The code, measured summaries, and editable manuscript are available in the accompanying repository.
+The paper tests an observable implication of the formula. We sealed numerical predictions before fitting the instruments on new viscous Burgers and Allen–Cahn ensembles. We then crossed the two time scales on a separately specified Lorenz–96 experiment, comparing the joint formula with the approximation obtained by taking the limits sequentially. The article reports the ranges of finite spacings where the expansion predicts both direction and magnitude, together with failures, time-step sensitivity and a snapshot-only check.
+
+The manuscript, source code, protocols, signed matrix forecasts and complete block-level scores are available at https://github.com/fightforbelief/p1-noisy-opinf.
 
 Hanqing Yang
 Corresponding author, on behalf of Yunjie Guo and Hanqing Yang
-Independent researchers, Suzhou, China
+Independent Researcher, Suzhou, China
 hanqing.yang189@gmail.com

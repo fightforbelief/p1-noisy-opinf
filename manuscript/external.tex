@@ -1,0 +1,15 @@
+\section{External test of the crossover term}
+The two-lag coefficient in \eqref{eq:cross} differs from the product of separate small-spacing and small-horizon factors by the multiplier $1+3h/\tau$. The two formulas predict the same direction, allowing a test of the mixed term using magnitude as well as orientation. After examining the PDE experiment, we fixed this comparison and its decision rule for the 40-variable Lorenz--96 model \cite{lorenz}. No trajectory from this system was used to develop the formulas.
+
+We solved $\dot x_i=(x_{i+1}-x_{i-2})x_{i-1}-x_i+8$ with cyclic indices. Eight independently seeded blocks contained 32 trajectories each. Initial coordinates were $8+N(0,1)$, independently sampled. Classical fourth-order Runge--Kutta integrated five spin-up time units at step $0.005$ and the analyzed segment at step $0.00025$. The block-zero temporal refinement started from the same spin-up endpoints. We reused the anchor schedule and POD ranks of the PDE experiment, then crossed four lag spacings with four forward horizons. The resulting ratios $\tau/h$ range from $0.02$ to $50$. Both the joint and separable forecasts used only the anchor states and their first two time derivatives. A second seal fixed all leading matrices before the first external lag fit.
+
+The primary comparison restricted $h,\tau\le0.005$ and used two lags. For each independent block we first computed its median relative matrix error over the eligible step pairs and both ranks. The criterion required at least seven of eight blocks to give a median of at most $0.25$ for the joint formula and a smaller median than for the separable formula. Table~\ref{tab:external} retains all step pairs.
+\begin{table}[ht]\centering\small
+\caption{External two-lag prediction on Lorenz--96. Each cell gives the median relative matrix error of the joint and separable formulas (joint / separable) over eight blocks and two ranks. Columns vary the forward horizon, and rows vary lag spacing.}\label{tab:external}
+\begin{tabular}{lrrrr}\toprule
+$h\backslash\tau$ & 0.00025 & 0.00125 & 0.005 & 0.025\\\midrule
+\tableinput crossover_table.tex
+\bottomrule\end{tabular}
+\end{table}
+
+The primary criterion was met in \ExternalPass{} of eight blocks. Block-median joint errors ranged from \JointPctLo\% to \JointPctHi\%, while the corresponding separable errors clustered around \SepMedianPct\%. At equal steps of $0.005$, the pooled median errors were $0.047$ and $0.749$, respectively. At the largest tested $\tau/h$ the two medians were close, as the mixed term is then small. The eight primary block medians summarize the declared small-step region. The individual cells in Table~\ref{tab:external} additionally reveal where a good region-wide median would conceal a larger local error. Every external grid cell passed the numerical rank and resolution checks. Step refinement on block zero changed the measured displacement by less than $3\times10^{-10}$ in relative norm. This external comparison concerns the fitted displacement. It does not establish improved Lorenz--96 forecasts.
